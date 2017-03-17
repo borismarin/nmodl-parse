@@ -1,4 +1,4 @@
-from ..units import unit, units_blk
+from nmodl.units import unit, units_blk
 
 def test_unit():
     test_string = '(mV) = (millivolt)'

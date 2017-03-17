@@ -1,5 +1,5 @@
 import pyparsing as pp
-from literals import UNITS, LBRACE, RBRACE, LPAR, RPAR
+from nmodl.literals import UNITS, LBRACE, RBRACE, LPAR, RPAR
 
 id = pp.Word(pp.alphanums + '/')
 
