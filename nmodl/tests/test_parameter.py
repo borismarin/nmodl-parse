@@ -2,9 +2,9 @@ from nmodl.parameter import par_def, par_blk
 
 
 def test_par_decl():
-    test_string = '(mV) = (millivolt)'
+    test_string = 'erev = -70      (mV)'
     assert(par_def.parseString(test_string).asList() ==
-           [['mV', '=', 'millivolt']])
+           ['erev', '=', '-70', 'mV'])
 
 
 def test_none():
@@ -16,13 +16,13 @@ def test_none():
 def test_two():
     from textwrap import dedent
     test_string = dedent("""
-    PARAMTER {
+    PARAMETER {
         v (mV)
         celsius = 6.3 (degC)
     }
     """)
     assert(par_blk.parseString(test_string).asList() ==
-           ['PARAMTER',
-               ['v', '(mV)'],
-               ['celsius', '=', '6.3', '(degC)']
+           ['PARAMETER',
+               ['v', 'mV'],
+               ['celsius', '=', '6.3', 'degC']
             ])
