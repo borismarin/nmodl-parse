@@ -1,8 +1,8 @@
-from nmodl.units import unit, units_blk
+from nmodl.units import unit_def, units_blk
 
 def test_unit():
     test_string = '(mV) = (millivolt)'
-    assert(unit.parseString(test_string).asList() ==
+    assert(unit_def.parseString(test_string).asList() ==
            [['mV', '=', 'millivolt']])
 
 

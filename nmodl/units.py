@@ -1,11 +1,11 @@
 import pyparsing as pp
 from nmodl.terminals import UNITS, LBRACE, RBRACE, LPAR, RPAR
 
-id = pp.Word(pp.alphanums + '/')
+unit_id = pp.Word(pp.alphanums + '/') # TODO: allowed units?
 
-pid = LPAR + id + RPAR
-unit = pp.Group(pid + '=' + pid)
+unit_ref = LPAR + unit_id + RPAR
+unit_def = pp.Group(unit_ref + '=' + unit_ref)
 
-units = pp.OneOrMore(unit)
+units = pp.OneOrMore(unit_def)
 units_blk = UNITS + LBRACE + pp.Optional(units, default=[]) + RBRACE
 
