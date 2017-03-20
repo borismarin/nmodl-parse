@@ -1,18 +1,18 @@
 import pyparsing as pp
+from nmodl.terminals import FLOAT
 
 # stolen from http://pyparsing.wikispaces.com/file/view/oc.py/150660287/oc.py
 
 LPAR,RPAR,LBRACK,RBRACK,LBRACE,RBRACE,COMMA = map(pp.Suppress, "()[]{},")
-INT = pp.Keyword("int")
 WHILE = pp.Keyword("while")
 IF = pp.Keyword("if")
 ELSE = pp.Keyword("else")
 
 NAME = pp.Word(pp.alphas+"_", pp.alphanums+"_")
-integer = pp.Regex(r"[+-]?\d+")
+float = FLOAT #pp.Regex(r"[+-]?\d+")
 
 expr = pp.Forward()
-operand = NAME | integer 
+operand = NAME | float 
 expr << (pp.operatorPrecedence(operand, 
     [
     (pp.oneOf('! - *'), 1, pp.opAssoc.RIGHT),
@@ -35,7 +35,7 @@ stmt << pp.Group( ifstmt |
           expr |
           LBRACE + pp.ZeroOrMore(stmt) + RBRACE)
 
-vardecl = pp.Group(NAME + pp.Optional(LBRACK + integer + RBRACK))
+vardecl = pp.Group(NAME + pp.Optional(LBRACK + float + RBRACK))
 
 arg = pp.Group(NAME)
 body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
@@ -64,7 +64,7 @@ a = 10
 
 parse_print(ifstmt, '''
 if(1+1 == 2) 1
-else  0
+else  0e-12
 ''')
 
 parse_print(pp.ZeroOrMore(stmt), '''
@@ -79,9 +79,9 @@ sin(x)
 
 parse_print(fundecl, '''
 funfun(ab, c){
-    1+2
+    1+2.1
     if(c == 2){
-    42
+    -42e-2
 }
 }
 ''')
