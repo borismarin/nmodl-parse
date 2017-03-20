@@ -1,8 +1,11 @@
 # nmodl-parse
 [![Build Status](https://travis-ci.org/borismarin/nmodl-parse.svg?branch=master)](https://travis-ci.org/borismarin/nmodl-parse)
 
-Teaching myself pyparsing by writing a parser for _NEURON_ `.mod` files.
+Primitive, incomplete parser for _NEURON_ `.mod` files using _pyparsing_.
 
+Initial goals:
+ - swallow an acceptable number of 'real' `.mod` files, even if we are not trying to be comprehensive
+ - build an internal representation complete enough to be used for src2src compiling `.mod` to _NeuroML2/LEMS_ (nothing very smart, heuristics to be added later).
 
 See also:
 
