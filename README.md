@@ -9,3 +9,5 @@ See also:
 https://www.neuron.yale.edu/neuron/static/docs/help/neuron/nmodl/nmodl.html
 
 http://cns.iaf.cnrs-gif.fr/files/scopman.html
+
+https://www.neuron.yale.edu/neuron/static/papers/nc2000/nmodl400.pdf
