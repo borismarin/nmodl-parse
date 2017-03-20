@@ -12,10 +12,11 @@ COMMENT
 \t like a banana
 ENDCOMMENT
 PARAMETER{
-    erev = -70  (mV)
-    gnabar = .12 (mho/cm2)
+    erev = -70  (mV) : comment till eol
+    gnabar = .12 (mho/cm2) : one more
     COMMENT
         are inline comments allowed? I think so.
+        : here as well?
     ENDCOMMENT
 }
 ''').asDict())
