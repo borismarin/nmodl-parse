@@ -25,7 +25,7 @@ ASSIGNED {
         mtau (ms)       htau (ms)
         tadj
 }
-
+UNITSOFF
 PARAMETER{
     erev = -70  (mV) : comment till eol
     gnabar = .12 (mho/cm2) : one more
@@ -34,4 +34,5 @@ PARAMETER{
         : here as well?
     ENDCOMMENT
 }
+UNITSON
 ''').asDict())
