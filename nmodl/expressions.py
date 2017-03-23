@@ -1,6 +1,7 @@
 import pyparsing as pp
-from nmodl.terminals import (FLOAT, ID, RBRACE,
-                             LBRACE, RBRACK, LBRACK, RPAR, LPAR)
+from nmodl.terminals import (FLOAT, ID, RBRACE, LBRACE, RBRACK, LBRACK,
+                             RPAR, LPAR, LOCAL)
+from nmodl.units import unit_ref
 
 # stolen from http://pyparsing.wikispaces.com/file/view/oc.py/150660287/oc.py
 #  submitting a PR with the better regexp for assignents (L24) would be kind
@@ -37,14 +38,15 @@ stmt << pp.Group(ifstmt |
                  expr |
                  LBRACE + pp.ZeroOrMore(stmt) + RBRACE)
 
-vardecl = pp.Group(ID + pp.Optional(LBRACK + INT + RBRACK))
+vardecl = LOCAL + pp.Group(ID + pp.Optional(LBRACK + INT + RBRACK))
 
 body = pp.ZeroOrMore(stmt)
 
-#arg = pp.Group(ID)
-##body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
-##fundecl = pp.Group(ID + LPAR + pp.Optional(pp.Group(pp.delimitedList(arg)))
-#                   + RPAR + LBRACE + pp.Group(body) + RBRACE)
+arg = pp.Group(ID + pp.Optional(unit_ref))
+#body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
+body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
+fundecl = pp.Group(ID + LPAR + pp.Optional(pp.Group(pp.delimitedList(arg)))
+                   + RPAR + LBRACE + pp.Group(body) + RBRACE)
 
 
 for vname in ("ifstmt whilestmt ID vardecl stmt".split()):

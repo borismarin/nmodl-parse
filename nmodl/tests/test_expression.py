@@ -33,3 +33,19 @@ def test_body():
               ['sin', ['x']]]])
 
 
+def test_func():
+    fun = dedent('''
+    funfun(ab, c(pF)){
+        1+2.1
+        if(c == 2){
+        -42e-2
+        }
+    }
+    ''')
+    assert(ne.fundecl.parseString(fun).asList() ==
+           [['funfun', [['ab'], ['c', 'pF']], 
+             [[['1', '+', '2.1']],
+              ['if', 
+               ['c', '==', '2'],
+               [[['-', '42e-2']]]]]]])
+
