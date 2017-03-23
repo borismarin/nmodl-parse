@@ -1,28 +1,30 @@
 import pyparsing as pp
-from nmodl.terminals import FLOAT
+from nmodl.terminals import (FLOAT, ID, RBRACE,
+                             LBRACE, RBRACK, LBRACK, RPAR, LPAR)
 
 # stolen from http://pyparsing.wikispaces.com/file/view/oc.py/150660287/oc.py
+#  submitting a PR with the better regexp for assignents (L24) would be kind
 
-LPAR,RPAR,LBRACK,RBRACK,LBRACE,RBRACE,COMMA = map(pp.Suppress, "()[]{},")
 WHILE = pp.Keyword("while")
 IF = pp.Keyword("if")
 ELSE = pp.Keyword("else")
 
-NAME = pp.Word(pp.alphas+"_", pp.alphanums+"_")
-float = FLOAT #pp.Regex(r"[+-]?\d+")
+INT = pp.Regex(r"[+-]?\d+")
+
 
 expr = pp.Forward()
-operand = NAME | float 
-expr << (pp.operatorPrecedence(operand, 
+operand = ID | FLOAT
+expr << (pp.operatorPrecedence(
+    operand,
     [
-    (pp.oneOf('! - *'), 1, pp.opAssoc.RIGHT),
-    (pp.oneOf('* / %'), 2, pp.opAssoc.LEFT),
-    (pp.oneOf('+ -'), 2, pp.opAssoc.LEFT),
-    (pp.oneOf('< == > <= >= !='), 2, pp.opAssoc.LEFT),
-    (pp.Regex(r'=[^=]'), 2, pp.opAssoc.LEFT),
-    ]) + 
-    pp.Optional( LBRACK + expr + RBRACK | 
-              LPAR + pp.Group(pp.Optional(pp.delimitedList(expr))) + RPAR )
+        (pp.oneOf('! - *'), 1, pp.opAssoc.RIGHT),
+        (pp.oneOf('* / %'), 2, pp.opAssoc.LEFT),
+        (pp.oneOf('+ -'), 2, pp.opAssoc.LEFT),
+        (pp.oneOf('< == > <= >= !='), 2, pp.opAssoc.LEFT),
+        (pp.Regex('(?<!=)=(?!=)'), 2, pp.opAssoc.LEFT),  # corected original 
+    ]) +
+    pp.Optional(LBRACK + expr + RBRACK |
+                LPAR + pp.Group(pp.Optional(pp.delimitedList(expr))) + RPAR)
     )
 
 stmt = pp.Forward()
@@ -30,58 +32,25 @@ stmt = pp.Forward()
 ifstmt = IF - LPAR + expr + RPAR + stmt + pp.Optional(ELSE + stmt)
 whilestmt = WHILE - LPAR + expr + RPAR + stmt
 
-stmt << pp.Group( ifstmt |
-          whilestmt |
-          expr |
-          LBRACE + pp.ZeroOrMore(stmt) + RBRACE)
+stmt << pp.Group(ifstmt |
+                 whilestmt |
+                 expr |
+                 LBRACE + pp.ZeroOrMore(stmt) + RBRACE)
 
-vardecl = pp.Group(NAME + pp.Optional(LBRACK + float + RBRACK))
+vardecl = pp.Group(ID + pp.Optional(LBRACK + INT + RBRACK))
 
-arg = pp.Group(NAME)
-body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
-fundecl = pp.Group(NAME + LPAR + pp.Optional(pp.Group(pp.delimitedList(arg))) + RPAR +
-            LBRACE + pp.Group(body) + RBRACE)
+body = pp.ZeroOrMore(stmt)
+
+#arg = pp.Group(ID)
+##body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
+##fundecl = pp.Group(ID + LPAR + pp.Optional(pp.Group(pp.delimitedList(arg)))
+#                   + RPAR + LBRACE + pp.Group(body) + RBRACE)
 
 
-for vname in ("ifstmt whilestmt "
-               "NAME fundecl vardecl arg body stmt".split()):
+for vname in ("ifstmt whilestmt ID vardecl stmt".split()):
     v = vars()[vname]
     v.setName(vname)
 
-#for vname in "fundecl stmt".split():
-#    v = vars()[vname]
-#    v.setDebug()
-
-def parse_print(node, code_str):
-    ast = node.parseString(code_str, parseAll=True)
-
-    import pprint
-    pprint.pprint(ast.asList())
-
-parse_print(expr, '''
-a = 10
-''')
-
-parse_print(ifstmt, '''
-if(1+1 == 2) 1
-else  0e-12
-''')
-
-parse_print(pp.ZeroOrMore(stmt), '''
-a = 1
-a + 1
-if(a == 12){
-1 + 1
-2 % 21}
-else 
-sin(x)
-''')
-
-parse_print(fundecl, '''
-funfun(ab, c){
-    1+2.1
-    if(c == 2){
-    -42e-2
-}
-}
-''')
+# for vname in "fundecl stmt".split():
+#     v = vars()[vname]
+#     v.setDebug()

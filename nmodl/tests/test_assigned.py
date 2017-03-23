@@ -28,5 +28,4 @@ def test_assigned():
                ['mtau', 'ms'],
                ['htau', 'ms'],
                ['tadj'],
-
             ])
