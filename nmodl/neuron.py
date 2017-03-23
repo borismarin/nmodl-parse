@@ -1,5 +1,5 @@
 import pyparsing as pp
-from nmodl.terminals import NEURON, LBRACE, RBRACE, FLOAT
+from nmodl.terminals import NEURON, LBRACE, RBRACE, FLOAT, ID
 
 SUFFIX = pp.Keyword('SUFFIX')
 USEION = pp.Keyword('USEION')
@@ -12,20 +12,19 @@ NONSPECIFIC = pp.Keyword('NONSPECIFIC_CURRENT')
 EXTERNAL = pp.Keyword('EXTERNAL')
 VALENCE = pp.Keyword('VALENCE')
 
-id = pp.Word(pp.alphas, pp.alphanums+'_')  # TODO: allowed ids?
 
-suffix_stmt = (SUFFIX + id)
-global_stmt = (GLOBAL + pp.Group(pp.delimitedList(id)))
-range_stmt = RANGE + pp.Group(pp.delimitedList(id))
-pointer_stmt = (POINTER + pp.Group(pp.delimitedList(id)))
-ext_stmt = (EXTERNAL + pp.Group(pp.delimitedList(id)))
-nonspec_stmt = (NONSPECIFIC + pp.Group(pp.delimitedList(id)))
+suffix_stmt = (SUFFIX + ID)
+global_stmt = (GLOBAL + pp.Group(pp.delimitedList(ID)))
+range_stmt = RANGE + pp.Group(pp.delimitedList(ID))
+pointer_stmt = (POINTER + pp.Group(pp.delimitedList(ID)))
+ext_stmt = (EXTERNAL + pp.Group(pp.delimitedList(ID)))
+nonspec_stmt = (NONSPECIFIC + pp.Group(pp.delimitedList(ID)))
 
-read = READ + pp.Group(pp.delimitedList(id))
-write = WRITE + pp.Group(pp.delimitedList(id))
+read = READ + pp.Group(pp.delimitedList(ID))
+write = WRITE + pp.Group(pp.delimitedList(ID))
 valence = VALENCE + FLOAT
 rwv = pp.Optional(read) & pp.Optional(write) & pp.Optional(valence)
-useion_stmt = (USEION + id + rwv)
+useion_stmt = (USEION + ID + rwv)
 
 neuron_stmt = pp.Group(suffix_stmt | global_stmt | range_stmt | pointer_stmt |
                ext_stmt | nonspec_stmt | useion_stmt)

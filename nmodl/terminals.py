@@ -1,29 +1,32 @@
-from pyparsing import Suppress, Keyword, Regex
+import pyparsing as pp
 
-LPAR = Suppress('(')
-RPAR = Suppress(')')
-LBRACK = Suppress('[')
-RBRACK = Suppress(']')
-LBRACE = Suppress('{')
-RBRACE = Suppress('}')
-COMMA = Suppress(',')
 
-TITLE = Keyword('TITLE')
-UNITS = Keyword('UNITS')
-PARAMETER = Keyword('PARAMETER')
-COMMENT = Keyword('COMMENT')
-ASSIGNED = Keyword('ASSIGNED')
-NEURON = Keyword('NEURON')
+LPAR = pp.Suppress('(')
+RPAR = pp.Suppress(')')
+LBRACK = pp.Suppress('[')
+RBRACK = pp.Suppress(']')
+LBRACE = pp.Suppress('{')
+RBRACE = pp.Suppress('}')
+COMMA = pp.Suppress(',')
 
-BREAKPOINT = Keyword('BREAKPOINT')
-STATE = Keyword('STATE')
-FUNCTION = Keyword('FUNCTION')
-PROCEDURE = Keyword('PROCEDURE')
-INITIAL = Keyword('INITIAL')
-DERIVATIVE = Keyword('DERIVATIVE')
+TITLE = pp.Keyword('TITLE')
+UNITS = pp.Keyword('UNITS')
+PARAMETER = pp.Keyword('PARAMETER')
+COMMENT = pp.Keyword('COMMENT')
+ASSIGNED = pp.Keyword('ASSIGNED')
+NEURON = pp.Keyword('NEURON')
 
-UNITSON = Keyword('UNITSON')
-UNITSOFF = Keyword('UNITSOFF')
-THREADSAFE = Keyword('THREADSAFE')
+BREAKPOINT = pp.Keyword('BREAKPOINT')
+STATE = pp.Keyword('STATE')
+FUNCTION = pp.Keyword('FUNCTION')
+PROCEDURE = pp.Keyword('PROCEDURE')
+INITIAL = pp.Keyword('INITIAL')
+DERIVATIVE = pp.Keyword('DERIVATIVE')
 
-FLOAT = Regex('[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?')
+UNITSON = pp.Keyword('UNITSON')
+UNITSOFF = pp.Keyword('UNITSOFF')
+THREADSAFE = pp.Keyword('THREADSAFE')
+
+FLOAT = pp.Regex('[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?')
+
+ID = pp.Word(pp.alphas, pp.alphanums+'_')  # TODO: allowed ids?

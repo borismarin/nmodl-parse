@@ -1,5 +1,4 @@
 import pyparsing as pp
-from nmodl.terminals import STATE, LBRACE, RBRACE
+from nmodl.terminals import STATE, LBRACE, RBRACE, ID
 
-id = pp.Word(pp.alphas, pp.alphanums+'_')  # TODO: allowed ids?
-state_blk = STATE - LBRACE + pp.Group(pp.OneOrMore(id)) + RBRACE
+state_blk = STATE - LBRACE + pp.Group(pp.OneOrMore(ID)) + RBRACE
