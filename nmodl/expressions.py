@@ -1,58 +1,57 @@
 import pyparsing as pp
-from nmodl.terminals import (FLOAT, ID, RBRACE, LBRACE, RBRACK, LBRACK,
-                             RPAR, LPAR, LOCAL)
+from nmodl.terminals import FLOAT, ID, RBRACE, LBRACE, RPAR, LPAR, LOCAL
 from nmodl.units import unit_ref
 
-# stolen from http://pyparsing.wikispaces.com/file/view/oc.py/150660287/oc.py
-#  submitting a PR with the better regexp for assignents (L24) would be kind
+# adapted from http://pyparsing.wikispaces.com/file/view/pymicko.py
 
-WHILE = pp.Keyword("while")
-IF = pp.Keyword("if")
-ELSE = pp.Keyword("else")
+MUL = pp.oneOf("* /")
+ADD = pp.oneOf("+ -")
+RELATIONAL_OPERATORS = pp.oneOf("< > <= >= == !=")
 
-INT = pp.Regex(r"[+-]?\d+")
+Exp = pp.Forward()
+MulExp = pp.Forward()
+NumExp = pp.Forward()
+Arguments = pp.delimitedList(NumExp("exp") + pp.Optional(unit_ref))
+FunctionCall = ID + pp.FollowedBy('(') + \
+    LPAR + pp.Optional(Arguments)("args") + RPAR
 
+Exp << (FunctionCall
+        | FLOAT
+        | ID
+        | pp.Group(LPAR + NumExp + RPAR)
+        | pp.Group("+" + Exp)
+        | pp.Group("-" + Exp))
+MulExp << (Exp + pp.ZeroOrMore(MUL + Exp))
+NumExp << (MulExp + pp.ZeroOrMore(ADD + MulExp))
 
-expr = pp.Forward()
-operand = ID | FLOAT
-expr << (pp.operatorPrecedence(
-    operand,
-    [
-        (pp.oneOf('! - *'), 1, pp.opAssoc.RIGHT),
-        (pp.oneOf('* / %'), 2, pp.opAssoc.LEFT),
-        (pp.oneOf('+ -'), 2, pp.opAssoc.LEFT),
-        (pp.oneOf('< == > <= >= !='), 2, pp.opAssoc.LEFT),
-        (pp.Regex('(?<!=)=(?!=)'), 2, pp.opAssoc.LEFT),  # corected original 
-    ]) +
-    pp.Optional(LBRACK + expr + RBRACK |
-                LPAR + pp.Group(pp.Optional(pp.delimitedList(expr))) + RPAR)
-    )
+AndExp = pp.Forward()
+LogExp = pp.Forward()
+RelExp = (NumExp + RELATIONAL_OPERATORS + NumExp)
+AndExp << RelExp("exp") + pp.ZeroOrMore(pp.Literal("&&") + RelExp("exp"))
+LogExp << AndExp("exp") + pp.ZeroOrMore(pp.Literal("||") + AndExp("exp"))
 
-stmt = pp.Forward()
+Statement = pp.Forward()
+StatementList = pp.Forward()
+AssignmentStatement = (ID + pp.Suppress("=") + NumExp("exp"))
+FunctionCallStatement = FunctionCall
 
-ifstmt = IF - LPAR + expr + RPAR + stmt + pp.Optional(ELSE + stmt)
-whilestmt = WHILE - LPAR + expr + RPAR + stmt
+IfStatement = ((pp.Keyword("if") + pp.FollowedBy("(")) +
+               (LPAR + LogExp + RPAR) +
+               (Statement + pp.Empty()) +
+               pp.Optional(pp.Keyword("else") + Statement))
+WhileStatement = ((pp.Keyword("while") + pp.FollowedBy("(")) +
+                  (LPAR + LogExp + RPAR) + Statement)
+CompoundStatement = pp.Group(LBRACE + StatementList + RBRACE)
+Statement << (IfStatement | WhileStatement |
+              FunctionCallStatement | AssignmentStatement | CompoundStatement)
+StatementList << pp.ZeroOrMore(Statement)
 
-stmt << pp.Group(ifstmt |
-                 whilestmt |
-                 expr |
-                 LBRACE + pp.ZeroOrMore(stmt) + RBRACE)
+LocalVariable = LOCAL + ID
+LocalVariableList = pp.ZeroOrMore(LocalVariable)
 
-vardecl = LOCAL + pp.Group(ID + pp.Optional(LBRACK + INT + RBRACK))
-
-body = pp.ZeroOrMore(stmt)
-
-arg = pp.Group(ID + pp.Optional(unit_ref))
-#body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
-body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
-fundecl = pp.Group(ID + LPAR + pp.Optional(pp.Group(pp.delimitedList(arg)))
-                   + RPAR + LBRACE + pp.Group(body) + RBRACE)
-
-
-for vname in ("ifstmt whilestmt ID vardecl stmt".split()):
-    v = vars()[vname]
-    v.setName(vname)
-
-# for vname in "fundecl stmt".split():
-#     v = vars()[vname]
-#     v.setDebug()
+FunctionBody = LBRACE + pp.Optional(LocalVariableList) \
+    + StatementList + RBRACE
+Parameter = ID
+ParameterList = pp.delimitedList(Parameter)
+Function = ID + pp.Group(LPAR + pp.Optional(ParameterList)("params")
+                         + RPAR + FunctionBody)
