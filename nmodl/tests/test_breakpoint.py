@@ -2,8 +2,8 @@ from nmodl.breakpoint import solve, breakpoint_blk
 
 
 def test_solve():
-    assert(solve.parseString('SOLVE derivs').asList() ==
-           ['SOLVE', 'derivs'])
+    assert(solve.parseString('SOLVE derivs METHOD cnexp').asList() ==
+           ['SOLVE', 'derivs', 'METHOD', 'cnexp'])
 
 
 def test_breakpoint():
