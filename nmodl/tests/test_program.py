@@ -35,4 +35,37 @@ PARAMETER{
     ENDCOMMENT
 }
 UNITSON
+
+STATE { m h }
+
+BREAKPOINT {
+        SOLVE states METHOD cnexp
+        gna = tadj*gbar*m*m*m*h
+        ina = (1e-4) * gna * (v - ena)
+}
+
+
+PROCEDURE trates(v (mV)) {
+    TABLE minf,  hinf, mtau, htau
+    DEPEND celsius, temp, Ra, Rb, Rd, Rg, tha, thi1, thi2, qa, qi, qinf
+    FROM vmin TO vmax WITH 199
+
+        rates(v): not consistently executed from here if usetable == 1
+
+:        tinc = -dt * tadj
+
+:        mexp = 1 - exp(tinc/mtau)
+:        hexp = 1 - exp(tinc/htau)
+}
+
+INITIAL {
+    tadj = q10^((celsius - temp)/(10 (degC))) : make all threads calculate tadj at initialization
+
+        trates(v+vshift)
+        m = minf
+        h = hinf
+}
+
+
+
 ''').asDict())
