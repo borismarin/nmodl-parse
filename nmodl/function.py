@@ -1,4 +1,4 @@
 from nmodl.terminals import FUNCTION
-from nmodl.expressions import Function
+from nmodl.expressions import func_def
 
-function_blk = FUNCTION + Function
+function_blk = FUNCTION + func_def

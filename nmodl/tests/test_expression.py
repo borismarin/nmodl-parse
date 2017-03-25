@@ -2,11 +2,11 @@ import nmodl.expressions as ne
 
 
 def test_stmt():
-    assert(ne.Statement.parseString('a = 10').asList() == ['a', '10'])
+    assert(ne.stmt.parseString('a = 10').asList() == ['a', '10'])
 
 
 def test_if():
-    assert(ne.Statement.parseString('if(1+1==2)x=1\n else x=sin(0e-1)')
+    assert(ne.stmt.parseString('if(1+1==2)x=1\n else x=sin(0e-1)')
            .asList() ==
            ['if', '1', '+', '1', '==', '2',
             'x', '1',
@@ -14,7 +14,7 @@ def test_if():
 
 
 def test_if2():
-    assert(ne.IfStatement.parseString('if(abs(-1)==1)tan(pi/4)\n else log(-1)')
+    assert(ne.if_stmt.parseString('if(abs(-1)==1)tan(pi/4)\n else log(-1)')
            .asList() ==
            ['if',
             'abs', '-1', '==', '1', 'tan', 'pi', '/', '4',
@@ -22,13 +22,13 @@ def test_if2():
 
 
 def test_logical():
-    assert(ne.LogExp.parseString('x>1 && x<1.0e0')
+    assert(ne.logic_expr.parseString('x>1 && x<1.0e0')
            .asList() ==
            ['x', '>', '1', '&&', 'x', '<', '1.0e0'])
 
 
 def test_nested_func():
-    assert(ne.Statement.parseString('sin(arcsin(1))').asList() ==
+    assert(ne.stmt.parseString('sin(arcsin(1))').asList() ==
            ['sin', 'arcsin', '1'])
 
 
@@ -39,6 +39,6 @@ def test_funcdef():
          funfun = x * g
     }
     ''')
-    assert(ne.Function.parseString(f).asList() ==
+    assert(ne.func_def.parseString(f).asList() ==
            ['funfun', ['x', 'mV', 'g', 'mS',
            'funfun', 'x', '*', 'g']])
