@@ -46,8 +46,8 @@ Statement << (IfStatement | WhileStatement |
               FunctionCallStatement | AssignmentStatement | CompoundStatement)
 StatementList << pp.ZeroOrMore(Statement)
 
-LocalVariable = LOCAL + ID
-LocalVariableList = pp.ZeroOrMore(LocalVariable)
+LocalVariable = LOCAL + pp.delimitedList(ID)
+LocalVariableList = pp.ZeroOrMore(LocalVariable) 
 
 FunctionBody = LBRACE + pp.Optional(LocalVariableList) \
     + StatementList + RBRACE
