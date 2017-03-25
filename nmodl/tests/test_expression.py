@@ -27,3 +27,18 @@ def test_logical():
            ['x', '>', '1', '&&', 'x', '<', '1.0e0'])
 
 
+def test_nested_func():
+    assert(ne.Statement.parseString('sin(arcsin(1))').asList() ==
+           ['sin', 'arcsin', '1'])
+
+
+def test_funcdef():
+    from textwrap import dedent
+    f = dedent('''
+    funfun(x(mV), g(mS)){
+         funfun = x * g
+    }
+    ''')
+    assert(ne.Function.parseString(f).asList() ==
+           ['funfun', ['x', 'mV', 'g', 'mS',
+           'funfun', 'x', '*', 'g']])

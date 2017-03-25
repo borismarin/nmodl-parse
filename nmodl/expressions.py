@@ -11,7 +11,7 @@ RELATIONAL_OPERATORS = pp.oneOf("< > <= >= == !=")
 Exp = pp.Forward()
 MulExp = pp.Forward()
 NumExp = pp.Forward()
-Arguments = pp.delimitedList(NumExp("exp") + pp.Optional(unit_ref))
+Arguments = pp.delimitedList(NumExp("exp"))
 FunctionCall = ID + pp.FollowedBy('(') + \
     LPAR + pp.Optional(Arguments)("args") + RPAR
 
@@ -52,6 +52,6 @@ LocalVariableList = pp.ZeroOrMore(LocalVariable)
 FunctionBody = LBRACE + pp.Optional(LocalVariableList) \
     + StatementList + RBRACE
 Parameter = ID
-ParameterList = pp.delimitedList(Parameter)
+ParameterList = pp.delimitedList(Parameter + pp.Optional(unit_ref))
 Function = ID + pp.Group(LPAR + pp.Optional(ParameterList)("params")
                          + RPAR + FunctionBody)
