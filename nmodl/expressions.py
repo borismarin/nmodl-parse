@@ -3,6 +3,7 @@ pp.ParserElement.enablePackrat()
 
 from nmodl.terminals import FLOAT, ID, RBRACE, LBRACE, RPAR, LPAR, LOCAL, LBRACK, RBRACK
 from nmodl.units import unit_ref
+from nmodl.table import table
 
 
 UNARY = pp.oneOf("! -")
@@ -46,8 +47,9 @@ stmt << (if_stmt |
 
 vardecl = local_var_def
 
+
 param = pp.Group(ID + pp.Optional(unit_ref))
-body = pp.ZeroOrMore(vardecl) + pp.ZeroOrMore(stmt)
+body = pp.ZeroOrMore(vardecl) + pp.Optional(table) + pp.ZeroOrMore(stmt)
 func_def = (ID + LPAR + pp.Optional(pp.Group(pp.delimitedList(param)))
            + RPAR + LBRACE + pp.Group(body) + RBRACE)
 decl = func_def | vardecl

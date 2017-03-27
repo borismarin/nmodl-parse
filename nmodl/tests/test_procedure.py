@@ -7,21 +7,21 @@ def test_procedure():
            ['PROCEDURE', 'a', [['x', '=', '1']]])
 
 
-def test_procedure_locals():
+def test_procedure_locals_tables():
     fun = dedent('''
     PROCEDURE rates(vm (mV)){
     LOCAL a,b
+    TABLE h DEPEND celsius FROM 0 TO 1 WITH 200
     a = Ra
     b = Rg
-    htau = 1/(a+b)}
+    h = 1/(a+b)}
     ''')
     assert(procedure_blk.parseString(fun).asList() ==
            ['PROCEDURE',
             'rates',
             [['vm', 'mV']],
-            ['LOCAL',
-             'a',
-             'b',
+            ['LOCAL', 'a', 'b',
+             'TABLE', 'h', 'DEPEND', 'celsius', 'FROM', '0', 'TO', '1', 'WITH', '200',
              ['a', '=', 'Ra'],
              ['b', '=', 'Rg'],
-             ['htau', '=', ['1', '/', ['a', '+', 'b']]]]])
+             ['h', '=', ['1', '/', ['a', '+', 'b']]]]])
