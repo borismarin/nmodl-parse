@@ -18,8 +18,7 @@ def test_breakpoint():
     """)
     assert(breakpoint_blk.parseString(test_string).asList() ==
            ['BREAKPOINT',
-               'SOLVE', 'states',
-               'ina', 'gnabar', '*', 'm', '*', 'h', '*', ['v', '-', 'ena'],
-               'ik', 'gkbar', '*', 'n', '*', ['v', '-', 'ek'],
-               'il', 'gl', '*', ['v', '-', 'el'],
-            ])
+            'SOLVE', 'states',
+            ['ina', '=', ['gnabar', '*', 'm', '*', 'h', '*', ['v', '-', 'ena']]],
+            ['ik', '=', ['gkbar', '*', 'n', '*', ['v', '-', 'ek']]],
+            ['il', '=', ['gl', '*', ['v', '-', 'el']]]])

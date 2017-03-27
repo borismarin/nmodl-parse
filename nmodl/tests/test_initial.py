@@ -12,6 +12,8 @@ def test_initial():
     }
     ''')
     assert(initial_blk.parseString(fun).asList() ==
-           ['INITIAL', 'trates', 'v', '+', 'vshift',
-            'm', 'minf',
-            'h', 'hinf'])
+           ['INITIAL',
+            'trates',
+            [['v', '+', 'vshift']],
+            ['m', '=', 'minf'],
+            ['h', '=', 'hinf']])

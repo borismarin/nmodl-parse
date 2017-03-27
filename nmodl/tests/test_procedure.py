@@ -4,7 +4,7 @@ from nmodl.procedure import procedure_blk
 
 def test_procedure():
     assert(procedure_blk.parseString('PROCEDURE a(){x=1}').asList() ==
-           ['PROCEDURE', 'a', ['x', '1']])
+           ['PROCEDURE', 'a', [['x', '=', '1']]])
 
 
 def test_procedure_locals():
@@ -16,8 +16,12 @@ def test_procedure_locals():
     htau = 1/(a+b)}
     ''')
     assert(procedure_blk.parseString(fun).asList() ==
-           ['PROCEDURE', 'rates', ['vm', 'mV',
-                                   'LOCAL', 'a', 'b',
-                                   'a', 'Ra',
-                                   'b', 'Rg',
-                                   'htau', '1', '/', ['a', '+', 'b']]])
+           ['PROCEDURE',
+            'rates',
+            [['vm', 'mV']],
+            ['LOCAL',
+             'a',
+             'b',
+             ['a', '=', 'Ra'],
+             ['b', '=', 'Rg'],
+             ['htau', '=', ['1', '/', ['a', '+', 'b']]]]])
