@@ -66,6 +66,12 @@ INITIAL {
         h = hinf
 }
 
+DERIVATIVE states {   :Computes state variables m, h, and n
+        trates(v+vshift)      :             at the current v and dt.
+        m' =  (minf-m)/mtau
+        h' =  (hinf-h)/htau
+}
+
 
 
 ''').asDict())

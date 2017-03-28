@@ -20,7 +20,8 @@ ELSE = pp.Keyword('else')
 expr = pp.Forward()
 args = pp.Group(pp.Optional(pp.delimitedList(expr)))
 func_call = ID + LPAR + args + RPAR
-operand = func_call | ID | FLOAT + pp.Optional(unit_ref) 
+primed = pp.Combine(ID + pp.OneOrMore("'"))
+operand = func_call | primed | ID | FLOAT + pp.Optional(unit_ref) 
 expr << (pp.operatorPrecedence(operand,
                                [
                                    (pp.oneOf('! -'), 1, pp.opAssoc.RIGHT),
