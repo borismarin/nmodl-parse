@@ -6,10 +6,10 @@ setup(name='nmodl',
       url='http://github.com/borismarin/nmodl-parse',
       author='Boris Marin',
       author_email='borimsarin@gmail.com',
-      license='GLP3',
+      license='GPL3',
       packages=['nmodl'],
       zip_safe=False,
       setup_requires=['pytest-runner'],
       install_requires=['pyparsing'],
       tests_require=['pytest', 'pyparsing'],
-)
+      )
