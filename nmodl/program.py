@@ -1,11 +1,14 @@
 import pyparsing as pp
 
 from nmodl import (assigned, breakpoint, title, parameter, units, procedure,
-                   function, state, comment, terminals, initial)
+                   function, state, comment, terminals, initial, neuron,
+                   derivative)
 
 program = ((pp.Optional(title.title)('title') &
             pp.Optional(units.units_blk)('units') &
             pp.Optional(parameter.par_blk)('parameter') &
+            pp.Optional(neuron.neuron_blk)('neuron') &
+            pp.Optional(derivative.derivative_blk)('derivative') &
             pp.Optional(assigned.assigned_blk)('assigned') &
             pp.Optional(procedure.procedure_blk)('procedure') &
             pp.Optional(function.function_blk)('function') &

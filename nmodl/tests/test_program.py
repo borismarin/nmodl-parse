@@ -36,6 +36,17 @@ PARAMETER{
 }
 UNITSON
 
+NEURON {
+    THREADSAFE
+        SUFFIX na
+        USEION na READ ena WRITE ina
+        RANGE m, h, gna, gbar
+        GLOBAL tha, thi1, thi2, qa, qi, qinf, thinf
+        RANGE minf, hinf, mtau, htau
+        GLOBAL Ra, Rb, Rd, Rg
+        GLOBAL q10, temp, tadj, vmin, vmax, vshift
+        }
+
 STATE { m h }
 
 BREAKPOINT {
