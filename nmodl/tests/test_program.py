@@ -1,6 +1,7 @@
+import pprint
 from nmodl.program import program
 
-print(program.parseString('''
+p = program.parseString('''
 TITLE test mod file
 
 UNITS{
@@ -36,6 +37,18 @@ PARAMETER{
 }
 UNITSON
 
+PROCEDURE useless(){
+    LOCAL a
+    a = 42
+}
+FUNCTION efun(z) {
+        if (fabs(z) < 1e-6) {
+                efun = 1 - z/2
+        }else{
+                efun = z/(exp(z) - 1)
+        }
+}
+
 NEURON {
     THREADSAFE
         SUFFIX na
@@ -63,11 +76,12 @@ PROCEDURE trates(v (mV)) {
 
         rates(v): not consistently executed from here if usetable == 1
 
-:        tinc = -dt * tadj
+        tinc = -dt * tadj
 
-:        mexp = 1 - exp(tinc/mtau)
-:        hexp = 1 - exp(tinc/htau)
+        mexp = 1 - exp(tinc/mtau)
+        hexp = 1 - exp(tinc/htau)
 }
+
 
 INITIAL {
     tadj = q10^((celsius - temp)/(10 (degC))) : make all threads calculate tadj at initialization
@@ -85,4 +99,9 @@ DERIVATIVE states {   :Computes state variables m, h, and n
 
 
 
-''').asDict())
+''', parseAll=True)
+
+pprint.PrettyPrinter().pprint(p.asDict())
+
+
+

@@ -10,8 +10,8 @@ program = ((pp.Optional(title.title)('title') &
             pp.Optional(neuron.neuron_blk)('neuron') &
             pp.Optional(derivative.derivative_blk)('derivative') &
             pp.Optional(assigned.assigned_blk)('assigned') &
-            pp.Optional(procedure.procedure_blk)('procedure') &
-            pp.Optional(function.function_blk)('function') &
+            pp.ZeroOrMore(pp.Group(procedure.procedure_blk)('procedures*')) &
+            pp.ZeroOrMore(pp.Group(function.function_blk)('functions*')) &
             pp.Optional(breakpoint.breakpoint_blk)('breakpoint') &
             pp.Optional(state.state_blk)('state') &
             pp.Optional(initial.initial_blk)('initial')
