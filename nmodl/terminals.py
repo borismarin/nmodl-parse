@@ -8,6 +8,8 @@ RBRACK = pp.Suppress(']')
 LBRACE = pp.Suppress('{')
 RBRACE = pp.Suppress('}')
 COMMA = pp.Suppress(',')
+LT = pp.Suppress('<')
+GT = pp.Suppress('>')
 
 TITLE = pp.Keyword('TITLE')
 UNITS = pp.Keyword('UNITS')
