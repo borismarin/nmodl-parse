@@ -7,21 +7,21 @@ def get_sample(fname):
 
 
 def test_passive():
-    parsed = program.parseFile(get_sample('passiv.mod'))
+    parsed = program.parseFile(get_sample('passiv.mod'))[0].parsed
     #  to be improved
     #  passive.mod has UNITS, NEURON, PARAMETER, ASSIGNED, BREAKPOINT
     assert(len(parsed.asDict()) == 6)
 
 
 def test_leak():
-    parsed = program.parseFile(get_sample('leak.mod'))
+    parsed = program.parseFile(get_sample('leak.mod'))[0].parsed
     #  to be improved
     #  leak.mod has NEURON, PARAMETER, ASSIGNED, BREAKPOINT
     assert(len(parsed.asDict()) == 4)
 
 
 def test_hh1():
-    parsed = program.parseFile(get_sample('hh1.mod'))
+    parsed = program.parseFile(get_sample('hh1.mod'))[0].parsed
     #  to be improved
     #  hh1.mod has TITLE, NEURON, UNITS, PARAMETER, ASSIGNED, BREAKPOINT,
     #  INITIAL, PROCEDURE(2), FUNCTION, STATE
@@ -29,7 +29,7 @@ def test_hh1():
 
 
 def test_na():
-    parsed = program.parseFile(get_sample('na.mod'))
+    parsed = program.parseFile(get_sample('na.mod'))[0].parsed
     #  to be improved
     #  na.mod has NEURON, UNITS, PARAMETER, ASSIGNED, BREAKPOINT, INITIAL,
     #  PROCEDURE(2), DERIVATIVE, FUNCTION, STATE

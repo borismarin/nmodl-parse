@@ -2,12 +2,18 @@ import pyparsing as pp
 
 from nmodl import (assigned, breakpoint, title, parameter, units, procedure,
                    function, state, comment, terminals, initial, neuron,
-                   derivative)
+                   derivative, node)
 
 
-class Program(object):
-    def __init__(self, t):
-        self.title = t.title
+class Program(node.Node):
+    def unpack_parsed(self, parsed):
+        for n in ['title', 'units', 'parameter',
+                  'neuron', 'derivative',
+                  'assigned', 'procedures',
+                  'functions', 'breakpoint',
+                  'state', 'initial']:
+            setattr(self, n, getattr(parsed, n))
+
 
 program = ((pp.Optional(title.title)('title') &
             pp.Optional(units.units_blk)('units') &
