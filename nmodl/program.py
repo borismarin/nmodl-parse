@@ -4,6 +4,11 @@ from nmodl import (assigned, breakpoint, title, parameter, units, procedure,
                    function, state, comment, terminals, initial, neuron,
                    derivative)
 
+
+class Program(object):
+    def __init__(self, t):
+        self.title = t.title
+
 program = ((pp.Optional(title.title)('title') &
             pp.Optional(units.units_blk)('units') &
             pp.Optional(parameter.par_blk)('parameter') &
@@ -19,4 +24,6 @@ program = ((pp.Optional(title.title)('title') &
            .ignore(comment.comments)
            .ignore(terminals.UNITSOFF)
            .ignore(terminals.UNITSON)
-           .ignore(terminals.THREADSAFE))
+           .ignore(terminals.THREADSAFE)).setParseAction(Program)
+
+
