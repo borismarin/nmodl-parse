@@ -3,10 +3,10 @@ from nmodl.terminals import PARAMETER, LBRACE, RBRACE, FLOAT, ID, LT, GT, COMMA
 from nmodl.units import unit_ref
 
 limit = LT + FLOAT + COMMA + FLOAT + GT
-par_def = (ID
-           + pp.Optional('=' + FLOAT)
+par_def = (ID('name')
+           + pp.Optional('=' + FLOAT('val'))
            + pp.Optional(unit_ref)
            + pp.Optional(limit))
-pars = pp.OneOrMore(pp.Group(par_def))
+pars = pp.OneOrMore(pp.Group(par_def)('parameters*'))
 
 par_blk = PARAMETER + LBRACE + pp.Optional(pars, default=[]) + RBRACE

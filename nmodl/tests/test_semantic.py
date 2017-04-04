@@ -53,7 +53,8 @@ p = '''\
 '''
 
 interpreter = NModl(p)
-interpreter.interpret()
+interpreter.visit()
 print(interpreter.title)
 print(interpreter.state)
+print(interpreter.parameters)
 

@@ -5,21 +5,25 @@ class NModl(object):
     def __init__(self, mod_string):
         from nmodl.program import program
         self.parsed = program.parseString(mod_string)
+        self.parameters = {}
+        self.state = {}
 
-    def interpret(self):
+    def visit(self):
         for b in self.BLOCKS:
-            if self.parsed.get(b, None):
-                interpreter = getattr(self, 'interpret_' + b, self.nothing)
-                interpreter(self.parsed.get(b))
+            blk = self.parsed.get(b, None)
+            if blk:
+                getattr(self, 'visit_' + b, self.nothing)(blk)
 
     def nothing(self, _):
         pass
 
-    def interpret_title(self, title_blk):
+    def visit_title(self, title_blk):
         self.title = title_blk['title']
 
-    def interpret_state(self, state_blk):
-        self.state = state_blk['state_vars']
+    def visit_state(self, state_blk):
+        for s in state_blk.state_vars:
+            self.state[s] = None
 
-    def unparse(self):
-        pass
+    def visit_parameter(self, param_blk):
+        for pdef in param_blk.parameters:
+            self.parameters[pdef.name] = float(pdef.val)
