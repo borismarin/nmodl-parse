@@ -23,14 +23,16 @@ def test_leak():
 def test_hh1():
     parsed = program.parseFile(get_sample('hh1.mod'))
     #  to be improved
-    #  hh1.mod has TITLE, NEURON, UNITS, PARAMETER, ASSIGNED, BREAKPOINT,
-    #  INITIAL, PROCEDURE(2), FUNCTION, STATE
-    assert(len(parsed.asDict()) == 10)
+    assert(all(k in parsed.keys() for k in ('title', 'neuron', 'units',
+                                            'parameter', 'assigned',
+                                            'breakpoint', 'initial',
+                                            'procedures', 'functions', 'state')))
 
 
 def test_na():
     parsed = program.parseFile(get_sample('na.mod'))
     #  to be improved
-    #  na.mod has NEURON, UNITS, PARAMETER, ASSIGNED, BREAKPOINT, INITIAL,
-    #  PROCEDURE(2), DERIVATIVE, FUNCTION, STATE
-    assert(len(parsed.asDict()) == 10)
+    assert(all(k in parsed.keys() for k in ('neuron', 'units', 'parameter',
+                                            'assigned', 'breakpoint',
+                                            'initial', 'procedures', 'functions',
+                                            'state')))
