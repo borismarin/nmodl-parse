@@ -3,9 +3,7 @@
 
 Primitive, incomplete parser for _NEURON_ `.mod` files using _pyparsing_.
 
-Initial goals:
- - swallow an acceptable number of 'real' `.mod` files, even if we are not trying to be comprehensive
- - build an internal representation complete enough to be used for src2src compiling `.mod` to _NeuroML2/LEMS_ (nothing very smart, heuristics to be added later).
+The code in [master] already parses a number of garden-variety `mod`files. We are now experimenting to see how far we can get by operating directly on the parse tree without having to reinvent 'language workbench'-like functionality.
 
 See also:
 
