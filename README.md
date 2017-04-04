@@ -3,7 +3,7 @@
 
 Primitive, incomplete parser for _NEURON_ `.mod` files using _pyparsing_.
 
-The code in [master] already parses a number of garden-variety `mod`files. We are now experimenting to see how far we can get by operating directly on the parse tree without having to reinvent 'language workbench'-like functionality.
+The code in master already parses a number of [garden-variety `mod`files](nmodl/tests/sample_mods/). We are now experimenting to see how far we can get by operating directly on the parse tree without having to reinvent 'language workbench'-like functionality.
 
 See also:
 
