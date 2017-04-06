@@ -28,5 +28,5 @@ class NModl(object):
         for pdef in param_blk.parameters:
             try:
                 self.parameters[pdef.name] = float(pdef.val)
-            except ValueError:  # no or crazy val specified
+            except ValueError:  # no/crazy val specified
                 self.parameters[pdef.name] = None
