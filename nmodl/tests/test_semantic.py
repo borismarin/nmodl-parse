@@ -1,6 +1,4 @@
 from nmodl.semantic_model import NModl
-from nmodl.program import program
-
 
 p = '''\
     TITLE HH voltage-gated potassium current
@@ -22,13 +20,13 @@ p = '''\
          ek (mV)  :typically~-77.5
          ik (mA/cm2) gk (S/cm2)
     }
-    STATE{ n o}
+    STATE{ n }
     BREAKPOINT {
          SOLVE states METHOD cnexp
          gk = gkbar * n ^ 4
          ik = gk * (v-ek)
     }
-    INITIAL{ 
+    INITIAL{
          n = alpha(v) / (alpha(v) + beta(v))
     }
     DERIVATIVE states{
@@ -57,4 +55,3 @@ interpreter.visit()
 print(interpreter.title)
 print(interpreter.state)
 print(interpreter.parameters)
-

@@ -26,4 +26,7 @@ class NModl(object):
 
     def visit_parameter(self, param_blk):
         for pdef in param_blk.parameters:
-            self.parameters[pdef.name] = float(pdef.val)
+            try:
+                self.parameters[pdef.name] = float(pdef.val)
+            except ValueError:  # no or crazy val specified
+                self.parameters[pdef.name] = None
