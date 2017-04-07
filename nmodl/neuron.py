@@ -26,7 +26,7 @@ valence = VALENCE + FLOAT
 rwv = pp.Optional(read) & pp.Optional(write) & pp.Optional(valence)
 useion_stmt = (USEION + ID + rwv)
 
-neuron_stmt = pp.Group(suffix_stmt | global_stmt | range_stmt | pointer_stmt |
-               ext_stmt | nonspec_stmt | useion_stmt)
+neuron_stmt = (suffix_stmt('suffix') | global_stmt | range_stmt | pointer_stmt
+               | ext_stmt | nonspec_stmt | useion_stmt)
 
 neuron_blk = NEURON + LBRACE + pp.ZeroOrMore(neuron_stmt) + RBRACE
