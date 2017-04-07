@@ -1,6 +1,9 @@
 # NEURON 
 x86_64
 
+# simulation results
+*.dat
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

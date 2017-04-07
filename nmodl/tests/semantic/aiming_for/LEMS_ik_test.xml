@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<Lems xmlns="http://www.neuroml.org/lems/0.7.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/lems/0.7.2  https://raw.github.com/LEMS/LEMS/development/Schemas/LEMS/LEMS_v0.7.2.xsd">
+
+  <Target component="sim1" reportFile="simulator.props" timesFile="time.dat"/>
+
+  <!--Include standard NeuroML 2 ComponentType definitions-->
+  <Include file="Cells.xml"/>
+  <Include file="Networks.xml"/>
+  <Include file="Simulation.xml"/>
+
+  <!-- Channel/synapse files-->
+  <Include file="kd.channel.nml"/>
+  <Include file="pas.channel.nml"/>
+
+  <!--   Cell files-->
+  <Include file="ik_test.cell.nml"/>
+
+  <!--   Network file-->
+  <Include file="ik_test.net.nml"/>
+
+  <!--Note: this could be: Simulation id="sim1" ... , but Component type="Simulation" ...
+  is used to allow validation of this file according to the LEMS schema specified above...-->
+  <Component type="Simulation" id="sim1" length="500 ms" step="0.001 ms" target="net">
+    <Display id="d1" title="voltage"  xmin="0" xmax="500" ymin="-100.0" ymax="100" timeScale="1ms">
+        <Line id="VOLTAGE" timeScale="1ms" quantity="pop/0/cell/v" scale="1 mV" color="#000000"/>
+    </Display>
+
+    <OutputFile id="outf" fileName="jlems_ik_test.dat">
+      <OutputColumn id="v" quantity="pop/0/cell/v"/>
+      <OutputColumn id="n_kd" quantity="pop/0/cell/biophys/membraneProperties/kd_all/kd/n/q"/>
+    </OutputFile>
+
+  </Component>
+
+</Lems>
