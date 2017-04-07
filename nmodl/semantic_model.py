@@ -1,6 +1,6 @@
 class NModl(object):
-    BLOCKS = ['title', 'assigned', 'solve', 'parameter', 'derivative',
-              'state', 'procedure', 'function', 'iniial', 'breakpoint']
+    BLOCKS = ['title', 'assigned', 'solve', 'parameter', 'derivative', 'state',
+              'procedure', 'function', 'initial', 'breakpoint', 'neuron']
 
     def __init__(self, mod_string):
         from nmodl.program import program
