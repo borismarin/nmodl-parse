@@ -1,3 +1,4 @@
+from xml.dom import minidom
 from nmodl.lems_generator import NeuroMLLemsGenerator
 
 p = '''\
@@ -52,4 +53,4 @@ p = '''\
 
 gen = NeuroMLLemsGenerator(p)
 gen.visit()
-print(gen.render())
+print(minidom.parseString(gen.render()).toprettyxml(indent="   "))

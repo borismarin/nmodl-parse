@@ -25,10 +25,12 @@ class NeuroMLLemsGenerator(NModlVisitor):
 
     def visit_neuron(self, nrn_blk):
         name = nrn_blk.suffix[1] + '_lems'
-        SubElement(self.root, 'ComponentType',
-                   attrib={'id': name,
-                           'name': name,
-                           'extends': 'baseIonChannel'})
+        self.comptype = SubElement(self.root, 'ComponentType',
+                                attrib={'id': name,
+                                        'name':
+                                        name,
+                                        'extends':
+                                        'baseIonChannel'})
 
     def visit_state(self, state_blk):
         pass
@@ -36,5 +38,20 @@ class NeuroMLLemsGenerator(NModlVisitor):
     def visit_parameter(self, param_blk):
         pass
 
+    def extra_defs(self):
+        mv = Element('Constant', attrib={
+            'dimension': 'voltage',
+            'name': 'MV',
+            'value': '1mV',
+        })
+        ms = Element('Constant', attrib={
+            'dimension': 'time',
+            'name': 'MS',
+            'value': '1ms',
+        })
+        self.comptype.append(mv)
+        self.comptype.append(ms)
+
     def render(self):
+        self.extra_defs()
         return tostring(self.root)
