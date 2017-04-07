@@ -1,3 +1,4 @@
+from __future__ import division
 from math import exp, fabs
 
 
@@ -6,27 +7,14 @@ class NModlMechanism(object):
 
 
 class _ik(NModlMechanism):
-    gkbar = 0.036
-    n = None
-    v = None
 
-    @property
-    def state(self):
-        return {'n': self.n, 'v': self.v}
+    def __init__(self):
+        self.gkbar = 0.036
 
-    @property
-    def parameters(self):
-        return {'gkbar': self.gkbar}
-
-    def __init__(self, v0):  # need v from outside world...
-        x0 = self.initial(v0)
-        for xn, xv in x0.iteritems:
-            self.state[xn] = xv
-
-    def initial(self, v0):
+    def initial(self, external):
+        v = external['v']
         return {
-            'n': self.alpha(self.v)/(self.alpha(self.v) - self.beta(self.v)),
-            'v': v0
+            'n': self.alpha(v)/(self.alpha(v) + self.beta(v))
         }
 
     def alpha(self, v):
@@ -40,10 +28,18 @@ class _ik(NModlMechanism):
     def beta(self, v):
         return 0.125 * exp(-(v + 65) / 80)
 
-    def derivative(self):
+    def derivative(self, external):
+        v = external['v']
+        n = external['n']
         return {'n':
-                (1 - self.n) * self.alpha(self.v) - self.n * self.beta(self.v)
+                (1 - n) * self.alpha(v) - n * self.beta(v)
                 }
+
+    def ik(self, external):  # do we get one method for each WRITE?
+        n = external['n']
+        v = external['v']
+        ek = external['ek']
+        return self.gkbar * n ** 4 * (v - ek)
 
 
 def test_metavisit():
