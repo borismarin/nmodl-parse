@@ -1,0 +1,61 @@
+<neuroml>
+	<!--
+	<Dimension name="voltage" m="1" l="2" t="-3" i="-1" />
+	<Dimension name="conductanceDensity" m="-1" l="-4" t="3" i="2" />
+	<Dimension name="currentDensity" l="-2" i="1" />
+
+	<Unit symbol="mV" dimension="voltage" power="-3"/>
+	<Unit name="S_per_cm2" dimension="conductanceDensity" power="4"/>
+	<Unit name="mA_per_cm2" dimension="currentDensity" power="1"/>
+	-->
+
+	<ComponentType name="NModlMechanism">
+		<Requirement name="v" dimension="voltage" /> <!-- (v, celsius, t, dt, diam, area)  always available?  -->
+		<Exposure name="iDensity" dimension="currentDensity" /> <!--from NEURON/WRITE ik -->
+
+		<Exposure name="fopen" dimension="none" /> <!--JUST FOR TESTING in a std nml cell; NOT GENERATED -->
+	</ComponentType>
+
+	<ComponentType id="kd_lems" name="kd_lems" extends="baseIonChannel">
+		<Exposure name="iDensity" dimension="currentDensity" /> <!--from NEURON/WRITE ik -->
+		<Exposure name="fopen" dimension="none" /> <!--JUST FOR TESTING in a std nml cell; NOT GENERATED -->
+		<Exposure name="n" dimension="none" /> <!--JUST FOR TESTING in a std nml cell; NOT GENERATED -->
+
+		<Parameter name="gkbar" dimension="conductanceDensity"/>
+		<Constant dimension="voltage" name="MV" value="1mV"/>
+		<Constant dimension="time" name="MS" value="1ms"/>
+
+		<Parameter name="ek" dimension="voltage" /> <!-- from NEURON/READ ek -->
+		<Requirement name="v" dimension="voltage" /> <!-- (v, celsius, t, dt, diam, area)  always available?  -->
+		<!-- in NMODL, PARAMETERS and ASSIGNED variables are practically synonyms -->
+		<!-- ASSIGNED are RANGE(space dependent) by default, but can be set to GLOBAL in the NEURON block -->
+		<!-- PARAMETER are GLOBAL(space independent) by default, but can be set to RANGE in the NEURON block-->
+		<Exposure name="ik" dimension="currentDensity" /> <!--from NEURON/WRITE ik -->
+		<Dynamics>
+			<StateVariable name="n" dimension="none" exposure="n"/>
+			<DerivedVariable dimension="none" name="_V" value="v/MV"/>
+			<DerivedVariable dimension="none" name="_alpha_x" value="(_V + 55) / 10 " /><!-- mangle name for scoping... comes from FUNCTION alpha called below -->
+			<ConditionalDerivedVariable dimension="none" name="alpha"><!-- from DERIVATIVE (function call) -->
+				<Case condition="abs(_alpha_x) .gt. 1e-6" value="0.1*_alpha_x/(1-exp(-_alpha_x))" />
+				<Case value="0.1/(1-0.5*_alpha_x)" /><!-- empty conditions work as else: see https://github.com/LEMS/jLEMS/issues/78 -->
+			</ConditionalDerivedVariable>
+			<DerivedVariable dimension="none" name="beta" value="0.125*exp(-(_V+65) / 80 )" /><!-- from DERIVATIVE (FUNCTION call) -->
+			<TimeDerivative variable="n" value=" ((1 - n) * alpha - n * beta)/MS" /><!-- from DERIVATIVE -->
+			<DerivedVariable dimension="conductanceDensity" name="gk" value="gkbar * n^4" /> <!-- from BREAKPOINT -->
+
+			<!-- in neuroml this would belong to the cell -->
+			<DerivedVariable name="ik" dimension="currentDensity" exposure="iDensity" value="gk * (v-ek)" /><!-- from BREAKPOINT -->
+
+			<DerivedVariable dimension="none" name="fopen" exposure="fopen" value="n^4" /> <!-- JUST FOR TESTING -->
+
+			<OnStart>
+				<StateAssignment variable="n" value="alpha/(alpha + beta)"/>
+			</OnStart>
+
+
+		</Dynamics>
+	</ComponentType>
+
+
+	<kd_lems id="kd_lems" conductance="0nS" gkbar="0S_per_cm2" ek="-60mV"/>
+</neuroml>

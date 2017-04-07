@@ -52,7 +52,10 @@ def plot_timeseries(vdict, varlist):
 
     from numpy import loadtxt
     l = loadtxt('jlems_ik_test.dat')
-    ax2.plot(l[:, 0]*1000, l[:, 2], '-k', label='lems')
+    ax2.plot(l[:, 0]*1000, l[:, 2], '-k', label='nml')
+
+    l = loadtxt('jlems_ik_lems_test.dat')
+    ax2.plot(l[:, 0]*1000, l[:, 2], '-r', label='lems')
 
     ax2.legend()
     plt.show()
