@@ -29,7 +29,7 @@ UNITSON = pp.Keyword('UNITSON')
 UNITSOFF = pp.Keyword('UNITSOFF')
 THREADSAFE = pp.Keyword('THREADSAFE')
 
-FLOAT = pp.Regex('[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?')('float_literal')
+FLOAT = pp.Regex('[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?')('value')
 INT = pp.Word(pp.nums)
 
 ID = pp.Word(pp.alphas, pp.alphanums+'_')('id')  # TODO: allowed ids?
