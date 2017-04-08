@@ -4,7 +4,7 @@ from nmodl.units import unit_ref
 
 limit = LT + FLOAT + COMMA + FLOAT + GT
 par_def = (ID('name')
-           + pp.Optional('=' + FLOAT('val'))
+           + pp.Optional('=' + FLOAT('value'))
            + pp.Optional(unit_ref)
            + pp.Optional(limit))
 pars = pp.OneOrMore(pp.Group(par_def)('parameters*'))
