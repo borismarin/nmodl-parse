@@ -15,7 +15,7 @@ def test_limits():
 def test_none():
     test_string = 'PARAMETER { \n  }'
     assert(par_blk.parseString(test_string).asList() ==
-           ['PARAMETER', []])
+           ['PARAMETER'])
 
 
 def test_two():
