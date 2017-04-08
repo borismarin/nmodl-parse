@@ -52,6 +52,9 @@ p = '''\
 
 interpreter = NModl(p)
 interpreter.visit()
-print(interpreter.title)
-print(interpreter.state)
-print(interpreter.parameters)
+print('title:', interpreter.title)
+print('id:', interpreter.id)
+print('state:', interpreter.state)
+print('pars:', interpreter.parameters)
+print('requires:', interpreter.requires)
+print('exposes:', interpreter.exposes)
