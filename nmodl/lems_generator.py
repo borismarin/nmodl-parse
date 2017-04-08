@@ -52,10 +52,10 @@ class NeuroMLLemsGenerator(NModlVisitor):
         for pd in param_blk.parameters:
             dim, unit = mod_to_lems_units[pd.unit]
             SubElement(self.comptype, 'Parameter', attrib={
-                'name': pd.name,
+                'name': pd.id,
                 'dimension': dim
             })
-            par_vals[pd.name] = pd.value + ' ' + unit
+            par_vals[pd.id] = pd.value + ' ' + unit
         self.create_component(par_vals)
 
     def extra_comptype_defs(self):
