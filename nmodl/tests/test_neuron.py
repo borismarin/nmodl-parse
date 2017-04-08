@@ -75,8 +75,12 @@ def test_naming():
         NONSPECIFIC_CURRENT il
         RANGE gnabar, gkbar, gl, el
         SUFFIX hh1
+        USEION ca READ cao, cai WRITE cai, ica
         GLOBAL minf, hinf, ninf, mexp, hexp, nexp
     }
     """)
     parsed = n.neuron_blk.parseString(test_string)
     assert(parsed.suffix[1] == 'hh1')
+    assert(parsed.use_ions[0].ion == 'na')
+    assert(parsed.use_ions[1].read.asList() == ['ek'])
+    assert(parsed.use_ions[2].write.asList() == ['cai', 'ica'])

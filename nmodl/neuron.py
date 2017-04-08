@@ -20,13 +20,13 @@ pointer_stmt = (POINTER + pp.Group(pp.delimitedList(ID)))
 ext_stmt = (EXTERNAL + pp.Group(pp.delimitedList(ID)))
 nonspec_stmt = (NONSPECIFIC + pp.Group(pp.delimitedList(ID)))
 
-read = READ + pp.Group(pp.delimitedList(ID))
-write = WRITE + pp.Group(pp.delimitedList(ID))
+read = READ + pp.Group(pp.delimitedList(ID))('read')
+write = WRITE + pp.Group(pp.delimitedList(ID))('write')
 valence = VALENCE + FLOAT
 rwv = pp.Optional(read) & pp.Optional(write) & pp.Optional(valence)
-useion_stmt = (USEION + ID + rwv)
+useion_stmt = (USEION + ID('ion') + rwv)
 
 neuron_stmt = (suffix_stmt('suffix') | global_stmt | range_stmt | pointer_stmt
-               | ext_stmt | nonspec_stmt | useion_stmt)
+               | ext_stmt | nonspec_stmt | useion_stmt('use_ions*'))
 
 neuron_blk = NEURON + LBRACE + pp.ZeroOrMore(neuron_stmt) + RBRACE
