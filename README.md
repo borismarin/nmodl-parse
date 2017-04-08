@@ -4,8 +4,9 @@
 Primitive, incomplete parser for _NEURON_ `.mod` files using _pyparsing_.
 
 Initial goals:
- - swallow an acceptable number of 'real' `.mod` files, even if we are not trying to be comprehensive
- - build an internal representation complete enough to be used for src2src compiling `.mod` to _NeuroML2/LEMS_ (nothing very smart, heuristics to be added later).
+ - swallow an acceptable number of 'real' `.mod` files (see [tests](nmodl/tests/test_sample_mods.py))
+ - build a q&d LEMS/NeuroML generator. We are currently aiming for mechs
+   directly usable inside a NeuroML cell, so some ad-hoc elements will be inserted.
 
 See also:
 
