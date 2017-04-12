@@ -1,5 +1,5 @@
 from xml.dom import minidom
-from nmodl.lems_generator import NeuroMLLemsGenerator
+from nmodl.lems_generator import Mod2NeuroMLLems
 
 p = '''\
     TITLE HH voltage-gated potassium current
@@ -51,6 +51,5 @@ p = '''\
     }
 '''
 
-gen = NeuroMLLemsGenerator(p)
-gen.visit()
-print(minidom.parseString(gen.render()).toprettyxml(indent="   "))
+gen = Mod2NeuroMLLems(p)
+print(minidom.parseString(gen).toprettyxml(indent="   "))

@@ -15,13 +15,9 @@ class NModlVisitor(object):
               'derivative', 'state', 'procedure', 'function', 'initial',
               'breakpoint']  # order MATTERS!
 
-    def __init__(self, mod_string):
-        from nmodl.program import program
-        self.parsed = program.parseString(mod_string)
-
-    def visit(self):
+    def visit(self, parsed):
         for b in self.BLOCKS:
-            blk = self.parsed.get(b, None)
+            blk = parsed.get(b, None)
             if blk:
                 getattr(self, 'visit_' + b, self.nothing)(blk)
 
@@ -29,36 +25,32 @@ class NModlVisitor(object):
         pass
 
 
-class NeuroMLLemsGenerator(NModlVisitor):
+class LemsCompTypeGenerator(NModlVisitor):
 
-    root = Element('neuroml')
     context_mangler = [{'v': 'V'}]  # map global v to adimensional V
     id = ''
 
     def visit_neuron(self, nrn_blk):
         _, suff = nrn_blk.suffix
         self.id = suff + '_lems'
-        self.comptype = SubElement(self.root, 'ComponentType',
-                                   attrib={'id': self.id,
-                                           'name': self.id,
-                                           'extends':
-                                           'baseIonChannel'})
+        self.comp_type = Element('ComponentType',
+                                 attrib={'id': self.id,
+                                         'name': self.id,
+                                         'extends':
+                                         'baseIonChannel'})
 
     def visit_state(self, state_blk):
         pass
 
     def visit_parameter(self, param_blk):
-        par_vals = {}
         for pd in param_blk.parameters:
             dim, unit = mod_to_lems_units[pd.unit]
-            SubElement(self.comptype, 'Parameter', attrib={
+            SubElement(self.comp_type, 'Parameter', attrib={
                 'name': pd.id,
                 'dimension': dim
             })
-            par_vals[pd.id] = pd.value + ' ' + unit
-        self.create_component(par_vals)
 
-    def extra_comptype_defs(self):
+    def extra_comp_type_defs(self):
         # elements that don't come from parsing
         mv = Element('Constant', attrib={
             'dimension': 'voltage',
@@ -74,15 +66,42 @@ class NeuroMLLemsGenerator(NModlVisitor):
             'name': 'v',
             'dimension': 'voltage',
         })
-        self.comptype.append(mv)
-        self.comptype.append(ms)
-        self.comptype.append(reqv)
+        self.comp_type.append(mv)
+        self.comp_type.append(ms)
+        self.comp_type.append(reqv)
 
-    def create_component(self, par_vals):
+    def generate(self, parsed):
+        self.visit(parsed)
+        self.extra_comp_type_defs()
+        return self.comp_type
+
+
+class LemsComponentGenerator(NModlVisitor):
+
+    def visit_neuron(self, nrn_blk):
+        _, suff = nrn_blk.suffix
+        self.id = suff + '_lems'
+
+    def visit_parameter(self, param_blk):
+        self.par_vals = {}
+        for pd in param_blk.parameters:
+            dim, unit = mod_to_lems_units[pd.unit]
+            self.par_vals[pd.id] = pd.value + ' ' + unit
+
+    def generate(self, parsed):
+        self.visit(parsed)
         comp_attr = {'id': self.id}
-        comp_attr.update(par_vals)
-        self.component = SubElement(self.root, self.id, attrib=comp_attr)
+        comp_attr.update(self.par_vals)
+        return Element(self.id, attrib=comp_attr)
 
-    def render(self):
-        self.extra_comptype_defs()
-        return tostring(self.root)
+
+def Mod2NeuroMLLems(mod_string):
+
+    from nmodl.program import program
+    parsed = program.parseString(mod_string)
+
+    root = Element('neuroml')
+    root.append(LemsCompTypeGenerator().generate(parsed))
+    root.append(LemsComponentGenerator().generate(parsed))
+
+    return tostring(root)
