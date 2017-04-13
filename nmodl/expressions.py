@@ -1,7 +1,8 @@
 import pyparsing as pp
 pp.ParserElement.enablePackrat()
 
-from nmodl.terminals import FLOAT, ID, RBRACE, LBRACE, RPAR, LPAR, LOCAL, LBRACK, RBRACK
+from nmodl.terminals import (FLOAT, ID, RBRACE, LBRACE, RPAR, LPAR, LOCAL,
+                             LBRACK, RBRACK)
 from nmodl.units import unit_ref
 from nmodl.table import table
 
@@ -21,7 +22,7 @@ expr = pp.Forward()
 args = pp.Group(pp.Optional(pp.delimitedList(expr)))
 func_call = ID + LPAR + args + RPAR
 primed = pp.Combine(ID + pp.OneOrMore("'"))
-operand = func_call | primed | ID | FLOAT + pp.Optional(unit_ref) 
+operand = func_call | primed | ID | FLOAT + pp.Optional(unit_ref)
 expr << (pp.operatorPrecedence(operand,
                                [
                                    (pp.oneOf('! -'), 1, pp.opAssoc.RIGHT),
@@ -51,8 +52,8 @@ vardecl = local_var_def
 
 param = pp.Group(ID + pp.Optional(unit_ref))
 body = pp.ZeroOrMore(vardecl) + pp.Optional(table) + pp.ZeroOrMore(stmt)
-func_def = (ID + LPAR + pp.Optional(pp.Group(pp.delimitedList(param)))
-           + RPAR + LBRACE + pp.Group(body) + RBRACE)
+func_def = (ID + LPAR + pp.Optional(pp.Group(pp.delimitedList(param))) + RPAR +
+            pp.Optional(unit_ref) + LBRACE + pp.Group(body) + RBRACE)
 decl = func_def | vardecl
 
 # set parser element names

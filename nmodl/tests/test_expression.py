@@ -48,6 +48,17 @@ def test_funcdef():
            ['funfun', [['x', 'mV'], ['g', 'mS']],
             [['funfun', '=', ['x', '*', 'g']]]])
 
+def test_funcdef_units():
+    from textwrap import dedent
+    f = dedent('''
+    funfun(x(mV), g(mS))(/ms){
+         funfun = x * g
+    }
+    ''')
+    assert(ne.func_def.parseString(f).asList() ==
+           ['funfun', [['x', 'mV'], ['g', 'mS']], '/ms',
+            [['funfun', '=', ['x', '*', 'g']]]])
+
 
 def test_pow():
     assert(ne.expr.parseString('e^(2 * pi)').asList() ==
