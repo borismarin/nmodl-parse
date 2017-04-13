@@ -4,11 +4,12 @@ import nmodl.neuron as n
 def test_global():
     # RANGE, POINTER, NONSPECIFIC, EXTERNAL are identical
     test_string = 'GLOBAL minf'
-    assert(n.global_stmt.parseString(test_string).asList() ==
-           ['GLOBAL', ['minf']])
+    p = n.global_stmt.parseString(test_string)
+    assert(p.globals.asList() == ['minf'])
+
     test_string = 'GLOBAL minf, hinf'
-    assert(n.global_stmt.parseString(test_string).asList() ==
-           ['GLOBAL', ['minf', 'hinf']])
+    p = n.global_stmt.parseString(test_string)
+    assert(p.globals.asList() == ['minf', 'hinf'])
 
 
 def test_suffix():
@@ -24,20 +25,20 @@ def test_useion():
 
     test_string = 'USEION na READ ena'
     assert(n.useion_stmt.parseString(test_string).asList() ==
-           ['USEION', 'na', 'READ', ['ena']])
+           ['USEION', 'na', 'READ', 'ena'])
 
     test_string = 'USEION na WRITE ina'
     assert(n.useion_stmt.parseString(test_string).asList() ==
-           ['USEION', 'na', 'WRITE', ['ina']])
+           ['USEION', 'na', 'WRITE', 'ina'])
 
     test_string = 'USEION na WRITE ina READ ena'
     assert(n.useion_stmt.parseString(test_string).asList() ==
-           ['USEION', 'na', 'WRITE', ['ina'], 'READ', ['ena']])
+           ['USEION', 'na', 'WRITE', 'ina', 'READ', 'ena'])
 
-    test_string = 'USEION na WRITE ina READ ena VALENCE +1'
+    test_string = 'USEION na WRITE ina, ki READ ena VALENCE +1'
     assert(n.useion_stmt.parseString(test_string).asList() ==
-           ['USEION', 'na', 'WRITE', ['ina'],
-            'READ', ['ena'], 'VALENCE', '+1'])
+           ['USEION', 'na', 'WRITE', 'ina', 'ki',
+            'READ', 'ena', 'VALENCE', '+1'])
 
 
 def test_neuron():
@@ -55,13 +56,13 @@ def test_neuron():
     """)
     assert(n.neuron_blk.parseString(test_string).asList() ==
            ['NEURON',
-            'GLOBAL', ['x'],
-            'USEION', 'na', 'READ', ['ena'], 'WRITE', ['ina'],
-            'USEION', 'k', 'READ', ['ek'], 'WRITE', ['ik'], 'VALENCE', '+1',
-            'NONSPECIFIC_CURRENT', ['il'],
-            'RANGE', ['gnabar', 'gkbar', 'gl', 'el'],
+            'GLOBAL', 'x',
+            'USEION', 'na', 'READ', 'ena', 'WRITE', 'ina',
+            'USEION', 'k', 'READ', 'ek', 'WRITE', 'ik', 'VALENCE', '+1',
+            'NONSPECIFIC_CURRENT', 'il',
+            'RANGE', 'gnabar', 'gkbar', 'gl', 'el',
             'SUFFIX', 'hh1',
-            'GLOBAL', ['minf', 'hinf', 'ninf', 'mexp', 'hexp', 'nexp']
+            'GLOBAL', 'minf', 'hinf', 'ninf', 'mexp', 'hexp', 'nexp'
             ])
 
 
@@ -80,7 +81,7 @@ def test_naming():
     }
     """)
     parsed = n.neuron_blk.parseString(test_string)
-    assert(parsed.suffix[1] == 'hh1')
+    assert(parsed.suffix == 'hh1')
     assert(parsed.use_ions[0].ion == 'na')
-    assert(parsed.use_ions[1].read.asList() == ['ek'])
-    assert(parsed.use_ions[2].write.asList() == ['cai', 'ica'])
+    assert(parsed.use_ions[1].reads.asList() == ['ek'])
+    assert(parsed.use_ions[2].writes.asList() == ['cai', 'ica'])

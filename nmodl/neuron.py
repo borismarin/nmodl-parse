@@ -13,20 +13,20 @@ EXTERNAL = pp.Keyword('EXTERNAL')
 VALENCE = pp.Keyword('VALENCE')
 
 
-suffix_stmt = (SUFFIX + ID)
-global_stmt = (GLOBAL + pp.Group(pp.delimitedList(ID)))
-range_stmt = RANGE + pp.Group(pp.delimitedList(ID))
-pointer_stmt = (POINTER + pp.Group(pp.delimitedList(ID)))
-ext_stmt = (EXTERNAL + pp.Group(pp.delimitedList(ID)))
-nonspec_stmt = (NONSPECIFIC + pp.Group(pp.delimitedList(ID)))
+suffix_stmt = SUFFIX + ID('suffix')
+global_stmt = GLOBAL + pp.delimitedList(ID)('globals')
+range_stmt = RANGE + pp.delimitedList(ID)('ranges')
+pointer_stmt = POINTER + pp.delimitedList(ID)('pointers')
+ext_stmt = EXTERNAL + pp.delimitedList(ID)('externals')
+nonspec_stmt = NONSPECIFIC + pp.delimitedList(ID)('nonspecifics')
 
-read = READ + pp.Group(pp.delimitedList(ID))('read')
-write = WRITE + pp.Group(pp.delimitedList(ID))('write')
+read = READ + pp.delimitedList(ID)('reads')
+write = WRITE + pp.delimitedList(ID)('writes')
 valence = VALENCE + FLOAT
 rwv = pp.Optional(read) & pp.Optional(write) & pp.Optional(valence)
-useion_stmt = (USEION + ID('ion') + rwv)
+useion_stmt = USEION + ID('ion') + rwv
 
-neuron_stmt = (suffix_stmt('suffix') | global_stmt | range_stmt | pointer_stmt
+neuron_stmt = (suffix_stmt | global_stmt | range_stmt | pointer_stmt
                | ext_stmt | nonspec_stmt | useion_stmt('use_ions*'))
 
 neuron_blk = NEURON + LBRACE + pp.ZeroOrMore(neuron_stmt) + RBRACE
