@@ -36,40 +36,42 @@ class LemsCompTypeGenerator(NModlVisitor):
             self.units[adef.id] = adef.unit
 
     def visit_neuron(self, nrn_blk):
-        _, suff = nrn_blk.suffix
-        self.id = suff + '_lems'
+        self.id = nrn_blk.suffix + '_lems'
         self.comp_type = self.xml_element('ComponentType',
                                           {'id': self.id,
                                            'name': self.id,
                                            'extends': 'baseIonChannel'})
         self.exposures_requires(nrn_blk.use_ions)
 
+    def named_dimensional(self, exp_req_par, var, unit=None):
+        if unit is None:
+            unit = mod_to_lems_units[self.units[var]][0]
+        else:
+            self.units[var] = unit
+        self.xml_element(exp_req_par,
+                         {'name': var, 'dimension': unit},
+                         parent=self.comp_type)
+
     def exposures_requires(self, use_ions):
         for ui in use_ions:
             for r in ui.reads:
-                runit = mod_to_lems_units[self.units[r]][0]
-                self.xml_element('Requirement',
-                                 {'name': r, 'dimension': runit},
-                                 parent=self.comp_type)
+                self.named_dimensional('Requirement', r)
             for w in ui.writes:
-                wunit = mod_to_lems_units[self.units[w]][0]
-                self.xml_element('Exposure',
-                                 {'name': w, 'dimension': wunit},
-                                 parent=self.comp_type)
+                self.named_dimensional('Exposure', w)
 
     def visit_state(self, state_blk):
-        pass
+        for sv in state_blk.state_vars:
+            unit = sv.unit if sv.unit else 'none'
+            self.named_dimensional('Exposure', sv.id, unit)
 
     def visit_parameter(self, param_blk):
         for pd in param_blk.parameters:
-            dim, unit = mod_to_lems_units[pd.unit]
-            self.xml_element('Parameter',
-                             {'name': pd.id, 'dimension': dim},
-                             parent=self.comp_type)
+            unit = pd.unit if pd.unit else 'none'
+            self.named_dimensional('Parameter', pd.id, unit)
 
     def visit_functions(self, func_blk):
         for f in func_blk:
-            print('derived variable' + f.func_decl) 
+            pass
 
     def extra_comp_type_defs(self):
         # elements that don't come from parsing
@@ -88,8 +90,6 @@ class LemsCompTypeGenerator(NModlVisitor):
             return Element(name, attrib=attribs)
         else:
             return SubElement(parent, name, attrib=attribs)
-
-
 
     def generate(self, parsed):
         self.visit(parsed)
