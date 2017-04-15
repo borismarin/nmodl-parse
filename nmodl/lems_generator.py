@@ -45,11 +45,13 @@ class LemsCompTypeGenerator(NModlVisitor):
 
     def named_dimensional(self, exp_req_par, var, unit=None):
         if unit is None:
-            unit = mod_to_lems_units[self.units[var]][0]
+            mod_unit = self.units[var]  # fetch from unit registry
         else:
-            self.units[var] = unit
+            self.units[var] = unit  # add to registry
+            mod_unit = unit
+        lems_unit = mod_to_lems_units[mod_unit][0]
         self.xml_element(exp_req_par,
-                         {'name': var, 'dimension': unit},
+                         {'name': var, 'dimension': lems_unit},
                          parent=self.comp_type)
 
     def exposures_requires(self, use_ions):
@@ -61,17 +63,15 @@ class LemsCompTypeGenerator(NModlVisitor):
 
     def visit_state(self, state_blk):
         for sv in state_blk.state_vars:
-            unit = sv.unit if sv.unit else 'none'
-            self.named_dimensional('Exposure', sv.id, unit)
+            self.named_dimensional('Exposure', sv.id, sv.unit)
 
     def visit_parameter(self, param_blk):
         for pd in param_blk.parameters:
-            unit = pd.unit if pd.unit else 'none'
-            self.named_dimensional('Parameter', pd.id, unit)
+            self.named_dimensional('Parameter', pd.id, pd.unit)
 
     def visit_functions(self, func_blk):
         for f in func_blk:
-            pass
+            print(f)
 
     def extra_comp_type_defs(self):
         # elements that don't come from parsing
