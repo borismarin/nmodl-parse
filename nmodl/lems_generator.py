@@ -11,7 +11,7 @@ mod_to_lems_units = {
 
 
 class NModlVisitor(object):
-    BLOCKS = ['title', 'assigned', 'neuron',  'state', 'parameter',
+    BLOCKS = ['title', 'assigned', 'neuron', 'state', 'parameter',
               'breakpoint', 'derivative', 'procedures', 'functions', 'initial',
               'units']  # order MATTERS!
 
@@ -37,30 +37,9 @@ class LemsCompTypeGenerator(NModlVisitor):
 
     def visit_neuron(self, nrn_blk):
         self.id = nrn_blk.suffix + '_lems'
-        self.comp_type = self.xml_element('ComponentType',
-                                          {'id': self.id,
-                                           'name': self.id,
-                                           'extends': 'baseIonChannel'})
-        self.extra_comp_type_defs()  # here just for ordered xml...
+        self.comp_type.attrib['id'] = self.id
+        self.comp_type.attrib['name'] = self.id
         self.exposures_requires(nrn_blk.use_ions)
-
-    def named_dimensional(self, exp_req_par, var, unit=None):
-        if unit is None:
-            mod_unit = self.units[var]  # TODO: what if unit is not there?
-        else:
-            self.units[var] = unit  # add to registry
-            mod_unit = unit
-        lems_unit = mod_to_lems_units[mod_unit][0]
-        self.xml_element(exp_req_par,
-                         {'name': var, 'dimension': lems_unit},
-                         parent=self.comp_type)
-
-    def exposures_requires(self, use_ions):
-        for ui in use_ions:
-            for r in ui.reads:
-                self.named_dimensional('Requirement', r)
-            for w in ui.writes:
-                self.named_dimensional('Exposure', w)
 
     def visit_state(self, state_blk):
         for sv in state_blk.state_vars:
@@ -71,35 +50,53 @@ class LemsCompTypeGenerator(NModlVisitor):
             self.named_dimensional('Parameter', pd.id, pd.unit)
 
     def visit_breakpoint(self, breakpoint_blk):
-        SubElement(self.comp_type, 'Dynamics') # is it really here?
+        pass
 
     def visit_functions(self, func_blk):
         for f in func_blk:
             print(f)
 
+    def named_dimensional(self, elem_type, var, unit=None):
+        if unit is None:
+            mod_unit = self.units[var]  # TODO: what if unit is not there?
+        else:
+            self.units[var] = unit  # add to registry
+            mod_unit = unit
+        lems_unit = mod_to_lems_units[mod_unit][0]
+        SubElement(self.parents[elem_type],
+                   elem_type, attrib={'name': var, 'dimension': lems_unit})
+
+    def exposures_requires(self, use_ions):
+        for ui in use_ions:
+            for r in ui.reads:
+                self.named_dimensional('Requirement', r)
+            for w in ui.writes:
+                self.named_dimensional('Exposure', w)
+
     def extra_comp_type_defs(self):
         # elements that don't come from parsing
         self.comp_type.append(
             Comment('The defs below are hardcoded for testing purposes!'))
-        self.xml_element('Constant',
-                         {'dimension': 'voltage', 'name': 'MV', 'value': '1mV'},
-                         parent=self.comp_type)
-        self.xml_element('Constant',
-                         {'dimension': 'time', 'name': 'MS', 'value': '1ms'},
-                         parent=self.comp_type)
-        self.xml_element('Requirement',
-                         {'name': 'v', 'dimension': 'voltage'},
-                         parent=self.comp_type)
+        SubElement(self.comp_type, 'Constant', attrib={
+            'dimension': 'voltage', 'name': 'MV', 'value': '1mV'})
+        SubElement(self.comp_type, 'Constant', attrib={
+            'dimension': 'time', 'name': 'MS', 'value': '1ms'})
+        SubElement(self.comp_type, 'Requirement', attrib={
+                         'name': 'v', 'dimension': 'voltage'})
         self.comp_type.append(Comment('End of hardcoded defs!'))
 
-    def xml_element(self, name, attribs, parent=None):
-        if parent is None:
-            return Element(name, attrib=attribs)
-        else:
-            return SubElement(parent, name, attrib=attribs)
-
     def generate(self, parsed):
+        self.comp_type = Element('ComponentType', attrib={
+            'extends': 'baseIonChannel'})
+        self.extra_comp_type_defs()
+        self.dynamics = Element('Dynamics')
+        self.parents = {'Parameter': self.comp_type, 'Requirement':
+                        self.comp_type, 'Exposure': self.comp_type,
+                        'DerivedVariable': self.dynamics, 'StateVariable':
+                        self.dynamics}
+
         self.visit(parsed)
+        self.comp_type.append(self.dynamics)
         return self.comp_type
 
 
