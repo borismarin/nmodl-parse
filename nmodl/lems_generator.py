@@ -1,4 +1,4 @@
-from xml.etree.ElementTree import Element, SubElement, tostring
+from xml.etree.ElementTree import Element, SubElement, tostring, Comment
 
 #  TODO: real unit handling
 mod_to_lems_units = {
@@ -11,9 +11,9 @@ mod_to_lems_units = {
 
 
 class NModlVisitor(object):
-    BLOCKS = ['title', 'assigned', 'neuron', 'solve', 'parameter',
-              'derivative', 'state', 'procedures', 'functions', 'initial',
-              'breakpoint']  # order MATTERS!
+    BLOCKS = ['title', 'assigned', 'neuron',  'state', 'parameter',
+              'breakpoint', 'derivative', 'procedures', 'functions', 'initial',
+              'units']  # order MATTERS!
 
     def visit(self, parsed):
         for b in self.BLOCKS:
@@ -41,11 +41,12 @@ class LemsCompTypeGenerator(NModlVisitor):
                                           {'id': self.id,
                                            'name': self.id,
                                            'extends': 'baseIonChannel'})
+        self.extra_comp_type_defs()  # here just for ordered xml...
         self.exposures_requires(nrn_blk.use_ions)
 
     def named_dimensional(self, exp_req_par, var, unit=None):
         if unit is None:
-            mod_unit = self.units[var]  # fetch from unit registry
+            mod_unit = self.units[var]  # TODO: what if unit is not there?
         else:
             self.units[var] = unit  # add to registry
             mod_unit = unit
@@ -69,12 +70,17 @@ class LemsCompTypeGenerator(NModlVisitor):
         for pd in param_blk.parameters:
             self.named_dimensional('Parameter', pd.id, pd.unit)
 
+    def visit_breakpoint(self, breakpoint_blk):
+        SubElement(self.comp_type, 'Dynamics') # is it really here?
+
     def visit_functions(self, func_blk):
         for f in func_blk:
             print(f)
 
     def extra_comp_type_defs(self):
         # elements that don't come from parsing
+        self.comp_type.append(
+            Comment('The defs below are hardcoded for testing purposes!'))
         self.xml_element('Constant',
                          {'dimension': 'voltage', 'name': 'MV', 'value': '1mV'},
                          parent=self.comp_type)
@@ -84,6 +90,7 @@ class LemsCompTypeGenerator(NModlVisitor):
         self.xml_element('Requirement',
                          {'name': 'v', 'dimension': 'voltage'},
                          parent=self.comp_type)
+        self.comp_type.append(Comment('End of hardcoded defs!'))
 
     def xml_element(self, name, attribs, parent=None):
         if parent is None:
@@ -93,15 +100,13 @@ class LemsCompTypeGenerator(NModlVisitor):
 
     def generate(self, parsed):
         self.visit(parsed)
-        self.extra_comp_type_defs()
         return self.comp_type
 
 
 class LemsComponentGenerator(NModlVisitor):
 
     def visit_neuron(self, nrn_blk):
-        _, suff = nrn_blk.suffix
-        self.id = suff + '_lems'
+        self.id = nrn_blk.suffix + '_lems'
 
     def visit_parameter(self, param_blk):
         self.par_vals = {}

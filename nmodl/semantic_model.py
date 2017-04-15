@@ -1,5 +1,5 @@
 class NModl(object):
-    BLOCKS = ['title', 'assigned', 'parameter', 'neuron', 'solve', 'state',
+    BLOCKS = ['title', 'assigned', 'parameter', 'neuron', 'units', 'state',
               'derivative', 'procedure', 'function', 'initial', 'breakpoint']
 
     '''
