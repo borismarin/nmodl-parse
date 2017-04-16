@@ -11,15 +11,15 @@ mod_to_lems_units = {
 
 
 class NModlVisitor(object):
-    BLOCKS = ['title', 'assigned', 'neuron', 'state', 'parameter',
-              'breakpoint', 'derivative', 'procedures', 'functions', 'initial',
-              'units']  # order MATTERS!
+    NODES = ['title', 'assigned', 'neuron', 'state', 'parameter',
+             'breakpoint', 'derivative', 'initial', 'units', 'body', 'stmts'
+             'literal', 'func_call', 'primed', 'variable', 'infix']  # order MATTERS!
 
     def visit(self, parsed):
-        for b in self.BLOCKS:
-            blk = parsed.get(b, None)
-            if blk:
-                getattr(self, 'visit_' + b, self.nothing)(blk)
+        for n in self.NODES:
+            node = parsed.get(n, None)
+            if node:
+                getattr(self, 'visit_' + n, self.nothing)(node)
 
     def nothing(self, _):
         pass
@@ -44,6 +44,7 @@ class LemsCompTypeGenerator(NModlVisitor):
     def visit_state(self, state_blk):
         for sv in state_blk.state_vars:
             self.named_dimensional('Exposure', sv.id, sv.unit)
+            self.named_dimensional('StateVariable', sv.id, sv.unit)
 
     def visit_parameter(self, param_blk):
         for pd in param_blk.parameters:
@@ -52,19 +53,21 @@ class LemsCompTypeGenerator(NModlVisitor):
     def visit_breakpoint(self, breakpoint_blk):
         pass
 
-    def visit_functions(self, func_blk):
-        for f in func_blk:
-            print(f)
+    def visit_derivative(self, deriv_blk):
+        from lems_expressions import genlems
+        print(genlems(deriv_blk.body[0]))
 
-    def named_dimensional(self, elem_type, var, unit=None):
+    def named_dimensional(self, elem_type, var, unit=None, value=None):
         if unit is None:
             mod_unit = self.units[var]  # TODO: what if unit is not there?
         else:
             self.units[var] = unit  # add to registry
             mod_unit = unit
         lems_unit = mod_to_lems_units[mod_unit][0]
-        SubElement(self.parents[elem_type],
-                   elem_type, attrib={'name': var, 'dimension': lems_unit})
+        attr = {'name': var, 'dimension': lems_unit}
+        if value:
+            attr['value'] = value
+        SubElement(self.parents[elem_type], elem_type, attrib=attr)
 
     def exposures_requires(self, use_ions):
         for ui in use_ions:
