@@ -6,10 +6,11 @@ from nmodl.lems_generator import LemsCompTypeGenerator
 def test_function():
     s = '''
     DERIVATIVE dx{
-        x' = double(-x) + double(1)
+        x' = mult(-x, 2) + mult(1, 2+1)
     }
-    FUNCTION double(arg){
-        LOCAL d=2
+    FUNCTION mult(arg1, arg2){
+        LOCAL d
+        d = arg2
         double = d * arg
     }'''
     LemsCompTypeGenerator().visit(program.parseString(s))

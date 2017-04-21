@@ -1,45 +1,50 @@
 from functools import singledispatch
-from nmodl.expressions import (Assignment, Binary, Primed, FuncCall, Unary,
-                               Identifier)
-
+from nmodl.expressions import (Assignment, Binary, Primed, FuncCall, Unary) 
 
 @singledispatch
-def genlems(x):
+def genlems(x, visitor):
     1/0
     pass
 
 
 @genlems.register(Binary)
-def _(a):
-    return genlems(a.left), a.op, genlems(a.right)
+def _(a, visitor):
+    return '{} {} {}'.format(genlems(a.left, visitor), a.op, genlems(a.right,
+                                                                     visitor))
 
 
 @genlems.register(Assignment)
-def _(a):
-    return genlems(a.left), a.op, genlems(a.right)
+def _(a, visitor):
+    return '{} {} {}'.format(genlems(a.left, visitor), a.op, genlems(a.right,
+                                                                     visitor))
 
 
 @genlems.register(Primed)
-def _(p):
-    return genlems(p.variable) + "'"
+def _(p, visitor):
+    return genlems(p.variable, visitor) + "'"
 
 
 @genlems.register(FuncCall)
-def _(f):
-    return f.func + '(' + genlems(f.args) + ')'
+def _(f, visitor):
+    try:
+        print(visitor.functions)
+        fd = visitor.functions.get(f.func)
+        print('found func', f.func, fd)
+    except:
+        pass
+    1/0
+    arglist = ', '.join([genlems(arg, visitor) for arg in f.args])
+    return f.func + '(' + arglist + ')'
 
 
 @genlems.register(Unary)
-def _(u):
-    return u.op + genlems(u.operand)
+def _(u, visitor):
+    return u.op + genlems(u.operand, visitor)
 
 
-@genlems.register(Identifier)
-def _(i):
-    return i.id
 
 @genlems.register(str)
-def _(s):
+def _(s, visitor):
     return s
 
 

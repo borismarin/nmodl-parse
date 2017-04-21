@@ -12,7 +12,7 @@ mod_to_lems_units = {
 
 class NModlVisitor(object):
     NODES = ['title', 'assigned', 'neuron', 'state', 'parameter',
-             'breakpoint', 'derivative', 'initial', 'units', 'body', 'stmts'
+             'breakpoint', 'functions', 'derivative', 'initial', 'units', 'body', 'stmts'
              'literal', 'func_call', 'primed', 'variable', 'infix']  # order MATTERS!
 
     def visit(self, parsed):
@@ -30,6 +30,7 @@ class LemsCompTypeGenerator(NModlVisitor):
     context_mangler = [{'v': 'V'}]  # map global v to adimensional V
     id = ''
     units = {'': 'none'}
+    functions = {}
 
     def visit_assigned(self, assign_blk):
         for adef in assign_blk.assigneds:
@@ -53,9 +54,14 @@ class LemsCompTypeGenerator(NModlVisitor):
     def visit_breakpoint(self, breakpoint_blk):
         pass
 
+    def visit_functions(self, func_blks):
+        for f in func_blks:
+            1/0
+            self.functions[f.fname] = f.body
+
     def visit_derivative(self, deriv_blk):
         from lems_expressions import genlems
-        print(genlems(deriv_blk.body[0]))
+        print(genlems(deriv_blk.body[0], self))
 
     def named_dimensional(self, elem_type, var, unit=None, value=None):
         if unit is None:
@@ -97,7 +103,6 @@ class LemsCompTypeGenerator(NModlVisitor):
                         self.comp_type, 'Exposure': self.comp_type,
                         'DerivedVariable': self.dynamics, 'StateVariable':
                         self.dynamics}
-
         self.visit(parsed)
         self.comp_type.append(self.dynamics)
         return self.comp_type

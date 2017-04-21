@@ -36,8 +36,8 @@ class Assignment(Binary):
 
 class FuncCall(object):
     def __init__(self, fc):
-        fid, self.args = fc
-        self.func = fid.id
+        self.func = fc.func
+        self.args = fc.args.asList()
 
     def __repr__(self):
         return repr([self.func, self.args])
@@ -45,6 +45,18 @@ class FuncCall(object):
     def __str__(self):
         return self.func + '(' + str(self.args) + ')'
 
+class FuncDef(object):
+    def __init__(self, fd):
+        self.name = fd.fname
+        self.args = fd.args.asList()
+        self.unit = fd.unit
+        self.body = fd.body
+
+    def __repr__(self):
+        return 'function ' + self.name + '(' + str(self.args) + ')'
+
+    def __str__(self):
+        return 'function ' + self.name + '(' + str(self.args) + ')'
 
 
 class Addition(Binary):
@@ -63,20 +75,20 @@ class Primed(object):
     def __init__(self, p):
         self.variable = p.id
     def __repr__(self):
-        return self.variable+"''"
+        return self.variable+"'"
     def __str__(self):
-        return self.variable+"''"
+        return self.variable+"'"
 
 
-class Identifier(object):
-    def __init__(self, v):
-        self.id = v.id
-    def __str__(self):
-        return self.id
-    def __repr__(self):
-        return self.id
+#class Identifier(object):
+#    def __init__(self, v):
+#        self.id = v.id
+#    def __str__(self):
+#        return self.id
+#    def __repr__(self):
+#        return self.id
 
-ID.setParseAction(Identifier)
+#ID.setParseAction(Identifier)
 
 UNARY = pp.oneOf("! -")
 MUL = pp.oneOf("* / %")
@@ -92,7 +104,7 @@ ELSE = pp.Keyword('else')
 
 expr = pp.Forward()
 args = pp.Optional(pp.delimitedList(expr))
-func_call = ID + LPAR + args + RPAR
+func_call = ID('func') + LPAR + args('args') + RPAR
 primed = pp.Combine(ID + pp.OneOrMore("'")).setParseAction(Primed)
 operand = func_call.setParseAction(FuncCall) | primed | ID | (FLOAT + pp.Optional(unit_ref))
 expr <<= (pp.infixNotation(operand,
@@ -122,6 +134,5 @@ vardecl = LOCAL + pp.delimitedList(ID)
 
 param = ID + pp.Optional(unit_ref)
 body = pp.ZeroOrMore(vardecl) & pp.Optional(table) & pp.ZeroOrMore(stmt)
-func_def = (ID + LPAR + pp.Optional(pp.delimitedList(param)) + RPAR +
-            pp.Optional(unit_ref) + LBRACE + body + RBRACE)
+func_def = (ID('fname') + LPAR + pp.Optional(pp.delimitedList(param)('args*')) + RPAR + pp.Optional(unit_ref)('unit') + LBRACE + body('body') + RBRACE).setParseAction(FuncDef)
 decl = func_def | vardecl
