@@ -1,9 +1,11 @@
 # nmodl-parse
 [![Build Status](https://travis-ci.org/borismarin/nmodl-parse.svg?branch=master)](https://travis-ci.org/borismarin/nmodl-parse)
 
-Primitive, incomplete parser for _NEURON_ `.mod` files using _pyparsing_.
+Tentative parser for _NEURON_ `.mod` files using _pyparsing_.
 
-The code in master already parses a number of [garden-variety `mod`files](nmodl/tests/sample_mods/). We are now experimenting to see how far we can get by operating directly on the parse tree without having to reinvent 'language workbench'-like functionality.
+If you are interested in doing anything complex (e.g. transpiling) with the parsed file, consider using the [pynmodl](https://github.com/borismarin/pynmodl) project, which provides better infrastructure and sample compilers (at the moment, `mod`->`LEMS`, unparser).
+
+The code in master already parses a number of [garden-variety `mod`files](nmodl/tests/sample_mods/). Given our more ambitious goal of compiling `mod` to [`LEMS`](https://github.com/LEMS/LEMS), and that parsing is just a small part of compilation, we have decided to adopt a 'language-workbench' approach with [textX](https://github.com/igordejanovic/textx) which can be found at https://github.com/borismarin/pynmodl.
 
 See also:
 
